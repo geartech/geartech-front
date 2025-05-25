@@ -1,11 +1,5 @@
-import "antd/dist/reset.css";
-import { Button } from "antd";
+'use client';
 
 export default function Home() {
-  return (
-    <div>
-      <h1>Hello Ant Design!</h1>
-      <Button type="primary">Botão Antd</Button>
-    </div>
-  );
+  return <div>TESTE</div>;
 }
