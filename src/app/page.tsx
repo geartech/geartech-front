@@ -1,5 +1,5 @@
 'use client';
 
 export default function Home() {
-  return <div>TESTE</div>;
+  return <div>LOGIN</div>;
 }
