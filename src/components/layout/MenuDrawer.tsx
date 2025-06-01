@@ -26,10 +26,11 @@ const drawerWidth = 240;
 interface MenuDrawerProps {
   mobileOpen: boolean;
   handleDrawerToggle: () => void;
+  expanded: boolean;
+  onToggleExpand?: () => void;
 }
 
-export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) {
-  const [expanded, setExpanded] = React.useState(true);
+export function MenuDrawer({ mobileOpen, handleDrawerToggle, expanded }: MenuDrawerProps) {
   const [openSubmenus, setOpenSubmenus] = React.useState<{ [key: string]: boolean }>({});
   const [search, setSearch] = React.useState('');
   const currentDrawerWidth = expanded ? drawerWidth : 40;

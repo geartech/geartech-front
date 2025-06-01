@@ -8,7 +8,6 @@ type FormButtonProps = {
 const FormButton: React.FC<FormButtonProps> = ({ label, ...rest }) => (
   <Button
     variant="contained"
-    fullWidth
     type="submit"
     {...rest}
   >

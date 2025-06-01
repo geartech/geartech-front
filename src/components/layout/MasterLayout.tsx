@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React, { useState } from 'react';
 import { Box, CssBaseline } from '@mui/material';
 import { MenuDrawer } from './MenuDrawer';
 import { Header } from './Header';
@@ -12,8 +12,9 @@ interface MasterLayoutProps {
 }
 
 export default function MasterLayout({ children }: MasterLayoutProps) {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
+  const [expanded, setExpanded] = useState(true);
 
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
@@ -23,6 +24,8 @@ export default function MasterLayout({ children }: MasterLayoutProps) {
         <MenuDrawer
           mobileOpen={mobileOpen}
           handleDrawerToggle={handleDrawerToggle}
+          expanded={expanded}
+          onToggleExpand={() => setExpanded((prev) => !prev)}
         />
         <Box
           component="main"

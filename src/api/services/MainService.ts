@@ -4,7 +4,7 @@
 /* eslint-disable */
 import type { CancelablePromise } from '../core/CancelablePromise';
 import { OpenAPI } from '../core/OpenAPI';
-import { request as __request } from '../core/request';
+import { request as __request } from '../../utils/requestCustom';
 export class MainService {
     /**
      * @returns string OK

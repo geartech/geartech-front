@@ -1,52 +1,30 @@
 'use client';
 
+import React from 'react';
 import Form from '@/components/Form';
-import { useApiGet } from '@/hooks/useApiGet';
-import { useApiMutation } from '@/hooks/useApiMutation';
-
-type LoginDTO = {
-  username: string;
-  password: string;
-  perfil: string;
-};
+import { AuthService } from '@/api/services/AuthService';
+import { AuthRequest } from '@/api/models/AuthRequest';
 
 export default function Home() {
-  const { data, isLoading, error } = useApiGet('profile', '/user/me');
-  const updateUser = useApiMutation('put', '/user/me');
-
-  function onSubmit(data: LoginDTO) {
-    console.log('Submit', data);
-  }
-
-  async function profile() {
-    if (isLoading) return <div>Carregando...</div>;
-
-    updateUser.mutateAsync({
-      name: 'Leandro',
-      email: 'leandro@email.com',
-      roles: ['admin', 'user'],
-    });
-   
+  // Função para lidar com o envio do formulário
+  async function onLogin(data: AuthRequest) {
+    try {
+      const user = await AuthService.login(data);
+      console.log('Usuário:', user);
+    } catch (error) {
+      // Lide com o erro, já pegando response do axios
+      console.error('Erro ao buscar usuário:', error);
+    }
   }
 
   return (
-    <Form<LoginDTO>
-      defaultValues={{ username: '', password: '', perfil: '' }}
-      onSubmit={onSubmit}
-    >
+    <Form<AuthRequest> onSubmit={onLogin}>
       <Form.Input
         variant="filled"
         name="username"
         label="Usuário"
         placeholder="Digite seu usuário"
         required
-        sx={{
-          width: {
-            xs: '100%', // Telas pequenas
-            sm: 400, // >=600px
-            md: 600, // >=900px
-          },
-        }}
       />
       <Form.Input
         variant="filled"
@@ -57,8 +35,8 @@ export default function Home() {
       />
 
       <Form.Button
+        type="submit"
         label="Entrar"
-        onClick={() => alert('teste')}
       />
     </Form>
   );

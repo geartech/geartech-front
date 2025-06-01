@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "cross-env NEXT_PUBLIC_API_URL=http://localhost:5000 next dev --turbopack",
+    "start": "cross-env NEXT_PUBLIC_API_URL=https://sua-api.com next start",
     "build": "next build",
-    "start": "next start",
     "lint": "next lint",
     "clean": "rimraf .next node_modules package-lock.json",
-    "generate:api": "npx openapi-typescript-codegen --input http://localhost:5000/geartech/v3/api-docs --output ./src/api --client axios"
+    "generate:api": "npx openapi-typescript-codegen --input http://localhost:5000/geartech/v3/api-docs --output ./src/api --client axios && node openai-config.js"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -18,7 +18,7 @@
     "@mui/material": "^7.1.0",
     "@tanstack/react-query": "^5.79.0",
     "axios": "^1.9.0",
-    "next": "15.1.8",
+    "next": "^15.3.3",
     "react": "^18.3.1",
     "react-dom": "18.3.1",
     "react-hook-form": "^7.56.4"
@@ -28,6 +28,7 @@
     "@types/node": "^20",
     "@types/react": "^18.2.62",
     "@types/react-dom": "^18.2.15",
+    "cross-env": "^7.0.3",
     "eslint": "^9",
     "eslint-config-next": "15.1.8",
     "openapi-typescript-codegen": "^0.29.0",

@@ -26,10 +26,22 @@ function FormInput({ name, label, required, variant, ...rest }: Props) {
           variant={variant || 'outlined'}
           size="small"
           label={label}
+          value={field.value ?? ''} // nunca undefined!
           required={required}
           error={!!errors[name]}
           helperText={errors[name]?.message as string}
           margin="normal"
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+              style: {
+                color: '#000', // Cor do label
+                fontWeight: 'normal', // Negrito
+                fontSize: 14, // Tamanho da fonte
+                letterSpacing: 1, // Espaçamento entre letras
+              },
+            },
+          }}
           {...rest}
         />
       )}
