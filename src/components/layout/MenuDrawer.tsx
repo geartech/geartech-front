@@ -1,6 +1,6 @@
 'use client';
 
-import * as React from 'react';
+import React, { useState } from 'react';
 import {
   Drawer,
   Toolbar,
@@ -29,9 +29,9 @@ interface MenuDrawerProps {
 }
 
 export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) {
-  const [expanded, setExpanded] = React.useState(true);
-  const [openSubmenus, setOpenSubmenus] = React.useState<{ [key: string]: boolean }>({});
-  const [search, setSearch] = React.useState('');
+  const [expanded, setExpanded] = useState(true);
+  const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
+  const [search, setSearch] = useState('');
   const currentDrawerWidth = expanded ? drawerWidth : 40;
   const theme = useTheme();
 
