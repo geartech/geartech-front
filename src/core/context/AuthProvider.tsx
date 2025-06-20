@@ -1,36 +1,64 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { UserLoginDTO } from '../sdk/api';
 import { geartechApi } from '../sdk';
 
-interface AuthContextType {
-  user: UserLoginDTO | undefined;
-  logout: () => void;
+export interface CredentialsProps {
+  username: string;
+  password: string;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: undefined,
-  logout: () => {},
+interface AuthContextProps {
+  user: UserLoginDTO | null;
+  authenticated: boolean;
+  login(credentials: CredentialsProps): Promise<void>;
+  logout(): Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextProps>({
+  user: null,
+  authenticated: false,
+  login: async () => {},
+  logout: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserLoginDTO | undefined>({});
+  const [user, setUser] = useState<UserLoginDTO | null>({});
 
-  const fetchUser = async () => {
-    try {
-      const res = await geartechApi.auth.getLoggedUser();
-      setUser(res.data);
-    } catch {
-      // logout();
-    } finally {
-      setLoading(false);
-    }
+  const load = useCallback(async () => {
+    await geartechApi.auth
+      .getLoggedUser()
+      .then((res) => setUser(res.data))
+      .catch(() => setUser(null));
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const login = async (credentials: CredentialsProps) => {
+    await geartechApi.auth.login(credentials);
+    await load();
   };
 
-  useEffect(() => {}, []);
+  const logout = async () => {
+    await geartechApi.auth.logout();
+    setUser(null);
+  };
 
-  return <AuthContext.Provider value={{ user, logout }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        authenticated: !!user,
+        logout,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);
