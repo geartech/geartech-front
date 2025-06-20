@@ -24,7 +24,7 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserLoginDTO | null>({});
+  const [user, setUser] = useState<UserLoginDTO | null>(null);
 
   const load = useCallback(async () => {
     await geartechApi.auth

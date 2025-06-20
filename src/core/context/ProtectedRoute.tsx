@@ -8,11 +8,11 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const router = useRouter();
   const pathname = usePathname();
 
-  const isLoginRoute = pathname === '/login';
+  const isLoginRoute = pathname === '/public/login';
 
   useEffect(() => {
     if (!user && !isLoginRoute) {
-      router.replace('/login');
+      router.replace('/public/login');
     }
   }, [user, isLoginRoute, router]);
 

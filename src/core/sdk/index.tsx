@@ -66,7 +66,11 @@ function applyCustomInterceptors(instance: typeof api) {
     async (error) => {
       const originalRequest: AxiosRequestConfig & { _retry?: boolean } = error.config;
 
-      if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/login')) {
+      if (
+        error.response?.status === 401 &&
+        !originalRequest._retry &&
+        !originalRequest.url?.includes('/public/login')
+      ) {
         if (isRefreshing) {
           return new Promise(function (resolve, reject) {
             failedQueue.push({ resolve, reject });
@@ -97,7 +101,7 @@ function applyCustomInterceptors(instance: typeof api) {
         } catch (err) {
           processQueue(err, null);
           clearTokens();
-          window.location.href = '/login';
+          window.location.href = '/public/login';
           return Promise.reject(err);
         } finally {
           isRefreshing = false;
