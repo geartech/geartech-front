@@ -14,6 +14,7 @@ interface AuthContextProps {
   authenticated: boolean;
   login(credentials: CredentialsProps): Promise<void>;
   logout(): Promise<void>;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -21,16 +22,22 @@ const AuthContext = createContext<AuthContextProps>({
   authenticated: false,
   login: async () => {},
   logout: async () => {},
+  loading: true,
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<UserLoginDTO | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    await geartechApi.auth
-      .getLoggedUser()
-      .then((res) => setUser(res.data))
-      .catch(() => setUser(null));
+    try {
+      const res = await geartechApi.auth.getLoggedUser();
+      setUser(res.data);
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -54,6 +61,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         authenticated: !!user,
         logout,
+        loading,
       }}
     >
       {children}

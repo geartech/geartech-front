@@ -4,22 +4,26 @@ import { useEffect } from 'react';
 import { useAuth } from './AuthProvider';
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { authenticated, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   const isLoginRoute = pathname === '/public/login';
 
   useEffect(() => {
-    if (!user && !isLoginRoute) {
+    if (loading) return; // Não faz nada enquanto carrega
+
+    if (!authenticated && !isLoginRoute) {
       router.replace('/public/login');
     }
-  }, [user, isLoginRoute, router]);
+  }, [authenticated, isLoginRoute, router, loading]);
 
   // Só renderiza:
   // 1. Se for login
   // 2. Ou está autenticado
-  if (!user && !isLoginRoute) return null;
+  if (loading) return null; // Ou um spinner, skeleton, etc.
+
+  if (!authenticated && !isLoginRoute) return null;
 
   return <>{children}</>;
 }

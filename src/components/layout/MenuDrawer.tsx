@@ -20,6 +20,8 @@ import { useTheme } from '@mui/material/styles';
 import { ExpandLess, ExpandMore } from '@mui/icons-material';
 import { menuItems } from '@/app/menu/menuItems';
 import Link from 'next/link';
+import { hasPermission } from '@/app/utils/hasPermission';
+import { useAuth } from '@/core/context/AuthProvider';
 
 const drawerWidth = 240;
 
@@ -29,6 +31,7 @@ interface MenuDrawerProps {
 }
 
 export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) {
+  const { user } = useAuth();
   const [expanded, setExpanded] = useState(true);
   const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
   const [search, setSearch] = useState('');
@@ -44,15 +47,20 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
   const filterMenu = (items: typeof menuItems) =>
     items
       .map((item) => {
+        console.log(user?.permissions, item.permission);
+        if (!hasPermission(user, item.permission)) return null;
+
         if (item.children) {
-          const filteredChildren = item.children.filter((child) =>
-            child.text.toLowerCase().includes(search.toLowerCase())
+          const filteredChildren = item.children.filter(
+            (child) => hasPermission(user, child.permission) && child.text.toLowerCase().includes(search.toLowerCase())
           );
+
           if (item.text.toLowerCase().includes(search.toLowerCase()) || filteredChildren.length > 0) {
             return { ...item, children: filteredChildren };
           }
           return null;
         }
+
         if (item.text.toLowerCase().includes(search.toLowerCase())) return item;
         return null;
       })
@@ -60,7 +68,6 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
 
   const drawer = (
     <div style={{ marginTop: '50px' }}>
-      {/* Header com campo de pesquisa */}
       <Toolbar
         sx={{
           minHeight: '50px !important',
@@ -68,7 +75,6 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
           p: '5px !important',
         }}
       >
-        {/* Botão de expandir/retrair menu */}
         {expanded && (
           <TextField
             variant="outlined"
@@ -76,9 +82,7 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
             placeholder="Pesquisar…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            sx={{
-              width: '100%',
-            }}
+            sx={{ width: '100%' }}
             slotProps={{
               input: {
                 startAdornment: (
@@ -90,20 +94,8 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
             }}
           />
         )}
-        {/* <span
-          onClick={() => setExpanded((prev) => !prev)}
-          style={{
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
-          }}
-        >
-          <MenuIcon />
-        </span> */}
       </Toolbar>
       <Divider />
-      {/* Lista de menu */}
       <List>
         {filterMenu(menuItems).map((item) => {
           const hasChildren = !!item.children && item.children.length > 0;
@@ -112,12 +104,10 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
             <React.Fragment key={item.text}>
               <ListItem
                 disablePadding
-                sx={{
-                  height: 35,
-                }}
+                sx={{ height: 35 }}
               >
                 <ListItemButton
-                  component={Link}
+                  component={item.href ? Link : 'div'}
                   href={item.href ?? '#'}
                   sx={{
                     justifyContent: expanded ? 'initial' : 'center',
@@ -132,7 +122,7 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
                 >
                   <ListItemIcon
                     sx={{
-                      minWidth: 26, // espaço padrão MUI
+                      minWidth: 26,
                       display: 'flex',
                       alignItems: 'center',
                       mr: expanded ? 1 : 'auto',
@@ -149,9 +139,9 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
                         m: 0,
                         transition: 'opacity 0.3s cubic-bezier(0.4,0,0.2,1)',
                         opacity: expanded ? 1 : 0,
-                        fontSize: 14, // menor fonte
+                        fontSize: 14,
                         '& .MuiTypography-root': {
-                          fontSize: 14, // força menor ainda
+                          fontSize: 14,
                           lineHeight: '1.5',
                           display: 'flex',
                           alignItems: 'center',
@@ -168,7 +158,7 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
                     ))}
                 </ListItemButton>
               </ListItem>
-              {/* Submenu */}
+
               {hasChildren && expanded && (
                 <Collapse
                   in={!!openSubmenus[item.text]}
@@ -185,21 +175,18 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
                         key={child.text}
                       >
                         <ListItemButton
-                          component={Link}
+                          component={child.href ? Link : 'div'}
                           href={child.href ?? '#'}
                           sx={{
                             justifyContent: expanded ? 'initial' : 'center',
                             px: 2,
                             py: 0.5,
-                            backgroundColor:
-                              theme.palette.mode === 'dark'
-                                ? '#23272b' // Cor para dark
-                                : '#f3f3f3', // Cor para light,
+                            backgroundColor: theme.palette.mode === 'dark' ? '#23272b' : '#f3f3f3',
                           }}
                         >
                           {expanded && (
                             <ListItemText
-                              primary={`${child.text}`}
+                              primary={child.text}
                               sx={{
                                 p: 0,
                                 m: 0,
@@ -225,7 +212,6 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
 
   return (
     <>
-      {/* Permanent drawer on desktop */}
       <Drawer
         variant="permanent"
         sx={{
@@ -243,14 +229,11 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
       >
         {drawer}
       </Drawer>
-      {/* Temporary drawer on mobile */}
       <Drawer
         variant="temporary"
         open={mobileOpen}
         onClose={handleDrawerToggle}
-        ModalProps={{
-          keepMounted: true,
-        }}
+        ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: 'block', sm: 'none' },
           '& .MuiDrawer-paper': {

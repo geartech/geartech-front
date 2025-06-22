@@ -1,25 +1,11 @@
 import { Api } from './api'; // SDK gerado pelo swagger-typescript-api
-import axios, { AxiosRequestConfig } from 'axios';
-
-// ===== Token Utils =====
-
-function getAccessToken() {
-  return localStorage.getItem('accessToken');
-}
-
-function setTokens({ accessToken }: { accessToken: string }) {
-  localStorage.setItem('accessToken', accessToken);
-}
-
-function clearTokens() {
-  localStorage.removeItem('accessToken');
-}
+import axios from 'axios';
 
 // ===== Instâncias Axios =====
-
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || '/',
-  timeout: 10000,
+  withCredentials: true,
+  timeout: 30000,
 });
 
 const refreshApi = axios.create({
@@ -27,85 +13,38 @@ const refreshApi = axios.create({
   withCredentials: true,
 });
 
-// ===== Fila de tentativas para refresh =====
-
-type FailedQueueItem = {
-  resolve: (token: string | null) => void;
-  reject: (error: unknown) => void;
-};
-
-let isRefreshing = false;
-let failedQueue: FailedQueueItem[] = [];
-
-const processQueue = (error: unknown, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
-
 // ===== Interceptors customizados =====
 
-function applyCustomInterceptors(instance: typeof api) {
-  // Request
-  instance.interceptors.request.use((config) => {
-    const token = getAccessToken();
-    if (token && config.headers) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  });
+function logout() {
+  document.cookie = 'accessToken=; Max-Age=0; path=/';
+  document.cookie = 'refreshToken=; Max-Age=0; path=/';
+  // Redireciona para login
+  window.location.href = '/public/login';
+}
 
-  // Response
+function applyCustomInterceptors(instance: typeof api) {
   instance.interceptors.response.use(
     (response) => response,
     async (error) => {
-      const originalRequest: AxiosRequestConfig & { _retry?: boolean } = error.config;
+      const originalRequest = error.config;
 
-      if (
-        error.response?.status === 401 &&
-        !originalRequest._retry &&
-        !originalRequest.url?.includes('/public/login')
-      ) {
-        if (isRefreshing) {
-          return new Promise(function (resolve, reject) {
-            failedQueue.push({ resolve, reject });
-          })
-            .then((token) => {
-              if (token && originalRequest.headers) {
-                originalRequest.headers['Authorization'] = 'Bearer ' + token;
-              }
-              return api(originalRequest);
-            })
-            .catch((err) => Promise.reject(err));
-        }
+      const isAuthEndpoint =
+        originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/refresh');
 
+      if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
         originalRequest._retry = true;
-        isRefreshing = true;
 
         try {
-          const res = await refreshApi.post('/auth/refresh');
-          const { accessToken } = res.data;
-          setTokens({ accessToken });
-          api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
-          processQueue(null, accessToken);
-
-          if (originalRequest.headers) {
-            originalRequest.headers['Authorization'] = 'Bearer ' + accessToken;
-          }
+          await refreshApi.post('/auth/refresh');
           return api(originalRequest);
         } catch (err) {
-          processQueue(err, null);
-          clearTokens();
-          window.location.href = '/public/login';
+          logout();
           return Promise.reject(err);
-        } finally {
-          isRefreshing = false;
         }
+      }
+
+      if (error.response?.status === 401 && isAuthEndpoint) {
+        logout();
       }
 
       return Promise.reject(error);
@@ -120,8 +59,11 @@ applyCustomInterceptors(api);
 
 export const geartechApi = new Api({
   baseURL: process.env.NEXT_PUBLIC_API_URL || '/',
-  // Outras configs fixas se quiser
+  withCredentials: true,
 });
+
+// usa credenciais
+geartechApi.instance.defaults.withCredentials = true;
 
 // SDK usa internamente o Axios próprio, mas agora com os mesmos interceptors!
 applyCustomInterceptors(geartechApi.instance);

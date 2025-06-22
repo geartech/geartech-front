@@ -8,6 +8,7 @@ interface MenuItemProps {
   text: string;
   icon?: React.ReactNode;
   href?: string;
+  permission?: string | string[];
   children?: MenuItemProps[];
 }
 
@@ -16,8 +17,8 @@ export const menuItems: MenuItemProps[] = [
     text: 'Dashboard',
     icon: <PieChartIcon sx={{ fontSize: 20 }} />,
     children: [
-      { text: 'Overview', href: '/pages/dashboard' },
-      { text: 'Stats', href: '/pages/dashboard' },
+      { text: 'Overview', href: '/pages/dashboard', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
+      { text: 'Stats', href: '/pages/dashboard', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
     ],
   },
   {

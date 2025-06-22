@@ -4,10 +4,15 @@ import { useAuth } from '@/core/context/AuthProvider';
 import { redirect } from 'next/navigation';
 
 export default function Home() {
-  const { authenticated } = useAuth();
-  if (!authenticated) {
-    redirect('/public/login');
+  const { authenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div>Carregando...</div>; // Ou skeleton, ou splash
   }
 
-  return <div>HOME</div>;
+  if (!authenticated) {
+    redirect('/public/login');
+  } else {
+    redirect('/auth/dashboard');
+  }
 }

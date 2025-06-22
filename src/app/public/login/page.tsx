@@ -6,6 +6,7 @@ import { Box, Button, TextField, Typography, Paper, InputAdornment, IconButton }
 
 import { AccountCircle, Lock, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useAuth } from '@/core/context/AuthProvider';
+import { redirect } from 'next/navigation';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -18,6 +19,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await login({ username, password });
+    redirect('/');
   };
 
   return (
