@@ -47,7 +47,6 @@ export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) 
   const filterMenu = (items: typeof menuItems) =>
     items
       .map((item) => {
-        console.log(user?.permissions, item.permission);
         if (!hasPermission(user, item.permission)) return null;
 
         if (item.children) {

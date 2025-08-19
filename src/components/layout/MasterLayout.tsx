@@ -16,7 +16,7 @@ export default function MasterLayout({ children }: MasterLayoutProps) {
   const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', flexDirection: 'column' }}>
+    <Box sx={{ display: 'flex', minHeight: '100dvh', flexDirection: 'column' }}>
       <CssBaseline />
       <Header handleDrawerToggle={handleDrawerToggle} />
       <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
@@ -29,14 +29,14 @@ export default function MasterLayout({ children }: MasterLayoutProps) {
           sx={{
             flexGrow: 1,
             width: { sm: `calc(100% - ${drawerWidth}px)` },
-            p: 1,
-            mt: 8,
+            p: 0,
+            pt: '50px', // espaço para o header fixo
             display: 'flex',
             flexDirection: 'column',
             minHeight: 0,
           }}
         >
-          <Box sx={{ flex: 1, overflow: 'auto', minHeight: 0 }}>{children}</Box>
+          <Box sx={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>{children}</Box>
         </Box>
       </Box>
       {/* <Footer /> */}

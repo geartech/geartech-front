@@ -1,10 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { ThemeProvider, createTheme } from '@mui/material';
+import { ThemeProvider } from '@mui/material';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import { useThemeMode } from '@/components/theme/ThemeContext';
+import ThemeCustom from './ThemeCustom';
 
 function createEmotionCache() {
   return createCache({ key: 'mui', prepend: true });
@@ -12,7 +13,7 @@ function createEmotionCache() {
 
 export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
   const { mode } = useThemeMode();
-  const theme = React.useMemo(() => createTheme({ palette: { mode } }), [mode]);
+  const theme = React.useMemo(() => ThemeCustom(mode), [mode]);
   const cache = React.useMemo(() => createEmotionCache(), []);
 
   return (

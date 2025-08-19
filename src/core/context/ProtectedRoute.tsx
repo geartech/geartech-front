@@ -8,13 +8,13 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
   const router = useRouter();
   const pathname = usePathname();
 
-  const isLoginRoute = pathname === '/public/login';
+  const isLoginRoute = pathname === '/pages/public/login';
 
   useEffect(() => {
     if (loading) return; // Não faz nada enquanto carrega
 
     if (!authenticated && !isLoginRoute) {
-      router.replace('/public/login');
+      router.replace('/pages/public/login');
     }
   }, [authenticated, isLoginRoute, router, loading]);
 

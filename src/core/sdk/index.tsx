@@ -15,12 +15,12 @@ const refreshApi = axios.create({
 
 // ===== Interceptors customizados =====
 
-function logout() {
-  document.cookie = 'accessToken=; Max-Age=0; path=/';
-  document.cookie = 'refreshToken=; Max-Age=0; path=/';
-  // Redireciona para login
-  window.location.href = '/public/login';
-}
+const logout = async () => {
+  try {
+    await geartechApi.auth.logout(); // chama o endpoint que limpa os cookies
+  } catch {}
+  window.location.href = '/pages/public/login';
+};
 
 function applyCustomInterceptors(instance: typeof api) {
   instance.interceptors.response.use(

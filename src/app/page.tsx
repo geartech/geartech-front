@@ -11,8 +11,8 @@ export default function Home() {
   }
 
   if (!authenticated) {
-    redirect('/public/login');
+    redirect('/pages/public/login');
   } else {
-    redirect('/auth/dashboard');
+    redirect('/pages/auth/home');
   }
 }

@@ -3,6 +3,7 @@ import DesktopWindowsIcon from '@mui/icons-material/DesktopWindows';
 import GroupIcon from '@mui/icons-material/Group';
 import PersonIcon from '@mui/icons-material/Person';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import { Home } from '@mui/icons-material';
 
 interface MenuItemProps {
   text: string;
@@ -14,29 +15,45 @@ interface MenuItemProps {
 
 export const menuItems: MenuItemProps[] = [
   {
+    text: 'Home',
+    icon: <Home sx={{ fontSize: 22 }} />,
+    href: '/pages/auth/home',
+  },
+  {
     text: 'Dashboard',
     icon: <PieChartIcon sx={{ fontSize: 20 }} />,
+    permission: ['ADM', 'PERM_DASHBOARD_VIEW'],
     children: [
-      { text: 'Overview', href: '/pages/dashboard', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
-      { text: 'Stats', href: '/pages/dashboard', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
+      { text: 'Overview', href: '/pages/auth/dashboard/user', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
+      { text: 'Stats', href: '/pages/auth/dashboard/stats', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
     ],
   },
   {
     text: 'Apps',
     icon: <DesktopWindowsIcon sx={{ fontSize: 20 }} />,
+    permission: ['ADM', 'PERM_DASHBOARD_VIEW'],
     children: [
-      { text: 'Web App', href: '/pages/dashboard' },
-      { text: 'Mobile App', href: '/pages/dashboard' },
+      { text: 'Web App', href: '/pages/dashboard', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
+      { text: 'Mobile App', href: '/pages/dashboard', permission: ['ADM', 'PERM_DASHBOARD_VIEW'] },
     ],
   },
-  { text: 'User', icon: <PersonIcon sx={{ fontSize: 20 }} /> },
+  {
+    text: 'User',
+    icon: <PersonIcon sx={{ fontSize: 20 }} />,
+    permission: ['PERM_DASHBOARD_VIEW'],
+  },
   {
     text: 'Team',
     icon: <GroupIcon sx={{ fontSize: 20 }} />,
+    permission: ['PERM_DASHBOARD_VIEW'],
     children: [
-      { text: 'Members', href: '/pages/dashboard' },
-      { text: 'Roles', href: '/pages/dashboard' },
+      { text: 'Members', href: '/pages/dashboard', permission: ['PERM_DASHBOARD_VIEW'] },
+      { text: 'Roles', href: '/pages/dashboard', permission: ['PERM_DASHBOARD_VIEW'] },
     ],
   },
-  { text: 'Files', icon: <InsertDriveFileIcon sx={{ fontSize: 20 }} /> },
+  {
+    text: 'Files',
+    icon: <InsertDriveFileIcon sx={{ fontSize: 20 }} />,
+    permission: ['PERM_DASHBOARD_VIEW'],
+  },
 ];

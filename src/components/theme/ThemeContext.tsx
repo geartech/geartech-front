@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useMemo, useState } from 'react';
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -20,7 +20,20 @@ export function useThemeMode() {
 export const ThemeModeProvider = ({ children }: { children: React.ReactNode }) => {
   const [mode, setMode] = useState<ThemeMode>('light');
 
-  const toggleMode = () => setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
+  // Carregar modo salvo
+  useEffect(() => {
+    const savedMode = localStorage.getItem('gt-theme-mode') as ThemeMode | null;
+    if (savedMode) setMode(savedMode);
+  }, []);
+
+  // Alternar e salvar
+  const toggleMode = () => {
+    setMode((prev) => {
+      const newMode = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('gt-theme-mode', newMode);
+      return newMode;
+    });
+  };
 
   const value = useMemo(() => ({ mode, toggleMode }), [mode]);
 
