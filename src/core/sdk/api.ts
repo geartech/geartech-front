@@ -10,8 +10,58 @@
  * ---------------------------------------------------------------
  */
 
-export interface AuthResponse {
-  token?: string;
+export interface UserRequest {
+  /** @format int64 */
+  id?: number;
+  /** @minLength 1 */
+  personalNumber: string;
+  /** @minLength 1 */
+  name: string;
+  /** @minLength 1 */
+  lastName: string;
+  /** @minLength 1 */
+  email: string;
+  phone?: string;
+  /** @minLength 1 */
+  password: string;
+  /** @format date-time */
+  expiration: string;
+  resetPassword: boolean;
+  active: boolean;
+}
+
+export interface UserDTO {
+  /** @format int64 */
+  id?: number;
+  personalNumber?: string;
+  name?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  /** @format date-time */
+  expiration?: string;
+  resetPassword?: boolean;
+  active?: boolean;
+}
+
+export interface ProjectRequest {
+  name?: string;
+  type?: string;
+  technology?: string;
+  description?: string;
+  repoUrl?: string;
+  status?: string;
+}
+
+export interface ProjectDTO {
+  /** @format int64 */
+  id?: number;
+  name?: string;
+  type?: string;
+  technology?: string;
+  description?: string;
+  repoUrl?: string;
+  status?: string;
 }
 
 export interface AuthRequest {
@@ -218,6 +268,132 @@ export class HttpClient<SecurityDataType = unknown> {
 export class Api<
   SecurityDataType extends unknown,
 > extends HttpClient<SecurityDataType> {
+  user = {
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name UpdateUser
+     * @request PUT:/user/update/{id}
+     */
+    updateUser: (id: string, data: UserRequest, params: RequestParams = {}) =>
+      this.request<UserDTO, any>({
+        path: `/user/update/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name CreateUser
+     * @request POST:/user/create
+     */
+    createUser: (data: UserRequest, params: RequestParams = {}) =>
+      this.request<UserDTO, any>({
+        path: `/user/create`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name GetByIdUser
+     * @request GET:/user/get/{id}
+     */
+    getByIdUser: (id: string, params: RequestParams = {}) =>
+      this.request<UserDTO, any>({
+        path: `/user/get/${id}`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name DeleteUser
+     * @request DELETE:/user/delete/{id}
+     */
+    deleteUser: (id: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/user/delete/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+  };
+  project = {
+    /**
+     * No description
+     *
+     * @tags project-controller
+     * @name UpdateProject
+     * @request PUT:/project/update/{id}
+     */
+    updateProject: (
+      id: string,
+      data: ProjectRequest,
+      params: RequestParams = {},
+    ) =>
+      this.request<ProjectDTO, any>({
+        path: `/project/update/${id}`,
+        method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags project-controller
+     * @name CreateProject
+     * @request POST:/project/create
+     */
+    createProject: (data: ProjectRequest, params: RequestParams = {}) =>
+      this.request<ProjectDTO, any>({
+        path: `/project/create`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags project-controller
+     * @name GetByIdProject
+     * @request GET:/project/get/{id}
+     */
+    getByIdProject: (id: string, params: RequestParams = {}) =>
+      this.request<ProjectDTO, any>({
+        path: `/project/get/${id}`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags project-controller
+     * @name DeleteProject
+     * @request DELETE:/project/delete/{id}
+     */
+    deleteProject: (id: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/project/delete/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+  };
   auth = {
     /**
      * No description
@@ -227,7 +403,7 @@ export class Api<
      * @request POST:/auth/refresh
      */
     refresh: (params: RequestParams = {}) =>
-      this.request<AuthResponse, any>({
+      this.request<void, any>({
         path: `/auth/refresh`,
         method: "POST",
         ...params,
@@ -241,7 +417,7 @@ export class Api<
      * @request POST:/auth/logout
      */
     logout: (params: RequestParams = {}) =>
-      this.request<object, any>({
+      this.request<void, any>({
         path: `/auth/logout`,
         method: "POST",
         ...params,
@@ -255,7 +431,7 @@ export class Api<
      * @request POST:/auth/login
      */
     login: (data: AuthRequest, params: RequestParams = {}) =>
-      this.request<AuthResponse, any>({
+      this.request<void, any>({
         path: `/auth/login`,
         method: "POST",
         body: data,
@@ -273,21 +449,6 @@ export class Api<
     getLoggedUser: (params: RequestParams = {}) =>
       this.request<UserLoginDTO, any>({
         path: `/auth/user`,
-        method: "GET",
-        ...params,
-      }),
-  };
-  app = {
-    /**
-     * No description
-     *
-     * @tags Main
-     * @name Load
-     * @request GET:/app/test
-     */
-    load: (params: RequestParams = {}) =>
-      this.request<string, any>({
-        path: `/app/test`,
         method: "GET",
         ...params,
       }),
