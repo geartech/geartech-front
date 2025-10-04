@@ -46,22 +46,79 @@ export interface UserDTO {
 
 export interface ProjectRequest {
   name?: string;
-  type?: string;
+  type?: "JAVA_SPRING" | "REACT";
   technology?: string;
   description?: string;
   repoUrl?: string;
-  status?: string;
+  status?:
+    | "PLANNED"
+    | "IN_PROGRESS"
+    | "BLOCKED"
+    | "ON_HOLD"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "ARCHIVED";
 }
 
 export interface ProjectDTO {
   /** @format int64 */
   id?: number;
   name?: string;
-  type?: string;
+  type?: "JAVA_SPRING" | "REACT";
   technology?: string;
   description?: string;
   repoUrl?: string;
-  status?: string;
+  status?:
+    | "PLANNED"
+    | "IN_PROGRESS"
+    | "BLOCKED"
+    | "ON_HOLD"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "ARCHIVED";
+}
+
+export interface AnalyzeRequest {
+  /** @format int64 */
+  idProject: number;
+  /** @minLength 1 */
+  repoUrl: string;
+  /** @minLength 1 */
+  branch: string;
+}
+
+export interface AnalyzeResponse {
+  moduleDir?: string;
+  module?: string;
+  basePackage?: string;
+  build?: BuildInfo;
+  database?: DatabaseInfo;
+  architecture?: ArchitectureInfo;
+  counts?: Record<string, number>;
+  starters?: string[];
+  notes?: string[];
+  packages?: Record<string, string[]>;
+}
+
+export interface ArchitectureInfo {
+  type?: string;
+  signals?: string[];
+}
+
+export interface BuildInfo {
+  tool?: string;
+  language?: string;
+  dependencies?: string[];
+}
+
+export interface DatabaseInfo {
+  name?: string;
+  inferredFrom?: string;
+  jdbcUrl?: string;
+  driver?: string;
+  dialect?: string;
+  username?: string;
+  password?: string;
 }
 
 export interface AuthRequest {
@@ -69,6 +126,61 @@ export interface AuthRequest {
   username: string;
   /** @minLength 1 */
   password: string;
+}
+
+export interface SearchProjectRequest {
+  /** @format date */
+  startDate?: string;
+  /** @format date */
+  endDate?: string;
+  name?: string;
+  projectType?: "JAVA_SPRING" | "REACT";
+  description?: string;
+  projectStatus?:
+    | "PLANNED"
+    | "IN_PROGRESS"
+    | "BLOCKED"
+    | "ON_HOLD"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "ARCHIVED";
+  /** @format int32 */
+  pageNum?: number;
+  /** @format int32 */
+  pageSize?: number;
+}
+
+export interface PageInfoProjectDTO {
+  /** @format int64 */
+  total?: number;
+  list?: ProjectDTO[];
+  /** @format int32 */
+  pageNum?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  size?: number;
+  /** @format int64 */
+  startRow?: number;
+  /** @format int64 */
+  endRow?: number;
+  /** @format int32 */
+  pages?: number;
+  /** @format int32 */
+  prePage?: number;
+  /** @format int32 */
+  nextPage?: number;
+  isFirstPage?: boolean;
+  isLastPage?: boolean;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+  /** @format int32 */
+  navigatePages?: number;
+  navigatepageNums?: number[];
+  /** @format int32 */
+  navigateFirstPage?: number;
+  /** @format int32 */
+  navigateLastPage?: number;
 }
 
 export interface UserLoginDTO {
@@ -370,6 +482,38 @@ export class Api<
      * No description
      *
      * @tags project-controller
+     * @name Analyze
+     * @request POST:/project/analyze
+     */
+    analyze: (data: AnalyzeRequest, params: RequestParams = {}) =>
+      this.request<AnalyzeResponse, any>({
+        path: `/project/analyze`,
+        method: "POST",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags project-controller
+     * @name GetAllProjects
+     * @request GET:/project/list
+     */
+    getAllProjects: (data: SearchProjectRequest, params: RequestParams = {}) =>
+      this.request<PageInfoProjectDTO, any>({
+        path: `/project/list`,
+        method: "GET",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags project-controller
      * @name GetByIdProject
      * @request GET:/project/get/{id}
      */
@@ -391,6 +535,21 @@ export class Api<
       this.request<void, any>({
         path: `/project/delete/${id}`,
         method: "DELETE",
+        ...params,
+      }),
+  };
+  card = {
+    /**
+     * No description
+     *
+     * @tags card-controller
+     * @name StartCard
+     * @request POST:/card/start/{idCard}
+     */
+    startCard: (idCard: number, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/card/start/${idCard}`,
+        method: "POST",
         ...params,
       }),
   };

@@ -17,7 +17,7 @@ export function Header({ handleDrawerToggle }: HeaderProps) {
   return (
     <AppBar
       position="fixed"
-      sx={{ zIndex: (theme) => theme.zIndex.drawer + 1, height: 50 }}
+      sx={{ height: 50 }}
     >
       <Toolbar sx={{ alignItems: 'center', minHeight: '50px !important' }}>
         <IconButton

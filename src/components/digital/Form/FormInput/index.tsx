@@ -1,6 +1,6 @@
 import { TextField, TextFieldProps } from '@mui/material';
 
-export default function Input(props: TextFieldProps) {
+export default function FormInput(props: TextFieldProps) {
   return (
     <TextField
       size="small"

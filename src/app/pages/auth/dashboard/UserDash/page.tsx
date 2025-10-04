@@ -1,13 +1,13 @@
 'use client';
 
-import PageLayout from '@/components/digital/PageLayout';
+import View from '@/components/digital/View';
 import { Box, Card } from '@mui/material';
 
-const { Header, Body } = PageLayout;
+const { Header, Body } = View;
 
 export default function UserDashboard() {
   return (
-    <PageLayout>
+    <View>
       <Header title="USER DASHBOARD" />
       <Body>
         <Card sx={{ padding: 2, width: '30%', height: '250px' }}>
@@ -16,6 +16,6 @@ export default function UserDashboard() {
           </Box>
         </Card>
       </Body>
-    </PageLayout>
+    </View>
   );
 }

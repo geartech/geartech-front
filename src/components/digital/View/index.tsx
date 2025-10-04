@@ -2,24 +2,33 @@
 import * as React from 'react';
 import { Paper, Box, Typography } from '@mui/material';
 
-type PageLayoutComponent = React.FC<{ children: React.ReactNode }> & {
-  Header: React.FC<{ title: string }>;
-  Body: React.FC<{ children: React.ReactNode }>;
-  Footer: React.FC<{ children: React.ReactNode }>;
+type ViewRootProps = React.PropsWithChildren<{
+  /** Quando estiver dentro do Drawer, use true */
+  isDrawer?: boolean;
+}>;
+
+type ViewHeaderProps = { title: string | React.ReactNode };
+type ViewBodyProps = { children: React.ReactNode };
+type ViewFooterProps = { children: React.ReactNode };
+
+type ViewComponent = React.FC<ViewRootProps> & {
+  Header: React.FC<ViewHeaderProps>;
+  Body: React.FC<ViewBodyProps>;
+  Footer: React.FC<ViewFooterProps>;
 };
 
-const PageLayout: PageLayoutComponent = ({ children }) => {
+const View: ViewComponent = ({ children, isDrawer = false }: ViewRootProps) => {
   return (
     <Box
       sx={{
         borderRadius: 2,
         flex: 1,
         minHeight: 0,
-        height: 'calc(100vh - 50px)',
+        height: isDrawer ? `calc(100vh - 115px)` : `calc(100vh - 50px)`,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'auto',
-        p: { xs: 1, sm: 1.5 },
+        overflow: 'hidden',
+        p: isDrawer ? 0 : { xs: 1, sm: 1.5 },
         gap: 1,
       }}
     >
@@ -28,7 +37,7 @@ const PageLayout: PageLayoutComponent = ({ children }) => {
   );
 };
 
-PageLayout.Header = function PageLayoutHeader({ title }: { title: string }) {
+View.Header = function ViewHeader({ title }: { title: string | React.ReactNode }) {
   return (
     <Paper
       elevation={0}
@@ -50,7 +59,7 @@ PageLayout.Header = function PageLayoutHeader({ title }: { title: string }) {
   );
 };
 
-PageLayout.Body = function PageLayoutBody({ children }: { children: React.ReactNode }) {
+View.Body = function ViewBody({ children }: ViewBodyProps) {
   const ref = React.useRef<HTMLDivElement>(null);
   const [atEnd, setAtEnd] = React.useState(true);
 
@@ -66,9 +75,11 @@ PageLayout.Body = function PageLayoutBody({ children }: { children: React.ReactN
     if (!el) return;
     const ro = new ResizeObserver(updateShadow);
     ro.observe(el);
+    el.addEventListener('scroll', updateShadow);
     window.addEventListener('resize', updateShadow);
     return () => {
       ro.disconnect();
+      el.removeEventListener('scroll', updateShadow);
       window.removeEventListener('resize', updateShadow);
     };
   }, [updateShadow]);
@@ -76,18 +87,14 @@ PageLayout.Body = function PageLayoutBody({ children }: { children: React.ReactN
   return (
     <Paper
       elevation={0}
-      onScroll={updateShadow}
-      ref={ref}
       sx={(theme) => ({
         borderRadius: 2,
         flex: 1,
         minHeight: 0,
+        position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'auto',
-        p: { xs: 1, sm: 1.5 },
-        position: 'relative',
-        // NÃO tocar em background/border/boxShadow -> herda do Header/tema
+        overflow: 'hidden', // <- evita que o ::after role junto
         '&::after': {
           content: '""',
           position: 'absolute',
@@ -107,12 +114,23 @@ PageLayout.Body = function PageLayoutBody({ children }: { children: React.ReactN
         },
       })}
     >
-      {children}
+      {/* Aqui é quem rola */}
+      <Box
+        ref={ref}
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflowY: 'auto',
+          p: { xs: 1, sm: 1.5 },
+        }}
+      >
+        {children}
+      </Box>
     </Paper>
   );
 };
 
-PageLayout.Footer = function PageLayoutFooter({ children }: { children: React.ReactNode }) {
+View.Footer = function ViewFooter({ children }: { children: React.ReactNode }) {
   return (
     <Box
       sx={{
@@ -126,4 +144,4 @@ PageLayout.Footer = function PageLayoutFooter({ children }: { children: React.Re
   );
 };
 
-export default PageLayout;
+export default View;

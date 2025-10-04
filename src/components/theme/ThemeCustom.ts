@@ -10,8 +10,8 @@ export default function ThemeCustom(mode: PaletteMode = 'light', options: ThemeO
   const textSec = isDark ? '#9aa4b2' : '#465063';
   const divider = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(2,6,23,0.08)';
   const inputBg = isDark ? '#0e1318' : '#ffffff';
-  const appBarBg = isDark ? '#0f1419' : '#ffffff';
-  const drawerBg = isDark ? '#0d1216' : '#ffffff';
+  const appBarBg = isDark ? '#0f1419' : '#cbd5e1';
+  const drawerBg = isDark ? '#0d1216' : '#94a3b8';
 
   // Scrollbar
   const scrollThumb = isDark ? '#566072' : '#94a3b8';
@@ -25,6 +25,11 @@ export default function ThemeCustom(mode: PaletteMode = 'light', options: ThemeO
     : '0 4px 8px rgba(0,0,0,.04), 0 16px 32px rgba(0,0,0,.06)';
 
   return createTheme({
+    zIndex: {
+      appBar: 1100,
+      drawer: 1200,
+      modal: 1300,
+    },
     palette: {
       mode,
       background: { default: bgPage, paper: bgPaper },
