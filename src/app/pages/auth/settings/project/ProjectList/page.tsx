@@ -1,7 +1,7 @@
 'use client';
 
 import View from '@/components/digital/View';
-import SimpleGrid from '@/components/digital/Form/FormGrid';
+import Grid from '@/components/digital/Grid';
 import { geartechApi } from '@/core/sdk';
 import { Button } from '@mui/material';
 
@@ -40,8 +40,7 @@ export default function ProjectList() {
     <View>
       <Header title="Projetos" />
       <Body>
-        
-        <SimpleGrid
+        <Grid
           columns={columns}
           data={data}
           crudRow

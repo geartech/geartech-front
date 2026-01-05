@@ -23,7 +23,15 @@ export const ThemeModeProvider = ({ children }: { children: React.ReactNode }) =
   // Carregar modo salvo
   useEffect(() => {
     const savedMode = localStorage.getItem('gt-theme-mode') as ThemeMode | null;
-    if (savedMode) setMode(savedMode);
+    if (savedMode) {
+      setMode(savedMode);
+      // Sincronizar atributo data-theme no HTML
+      document.documentElement.setAttribute('data-theme', savedMode);
+    } else {
+      // Se não há modo salvo, usar dark como padrão
+      setMode('dark');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    }
   }, []);
 
   // Alternar e salvar
@@ -31,6 +39,8 @@ export const ThemeModeProvider = ({ children }: { children: React.ReactNode }) =
     setMode((prev) => {
       const newMode = prev === 'light' ? 'dark' : 'light';
       localStorage.setItem('gt-theme-mode', newMode);
+      // Sincronizar atributo data-theme no HTML
+      document.documentElement.setAttribute('data-theme', newMode);
       return newMode;
     });
   };

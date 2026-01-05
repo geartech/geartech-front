@@ -20,7 +20,7 @@ type GridProps<T extends MRT_RowData> = {
   footerActions?: FooterActionsRenderer<T>; // << botões no footer
 };
 
-export default function FormGrid<T extends MRT_RowData>({
+export default function Grid<T extends MRT_RowData>({
   height,
   columns,
   data,

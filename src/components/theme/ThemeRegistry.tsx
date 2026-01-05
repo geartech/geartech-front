@@ -4,6 +4,10 @@ import * as React from 'react';
 import { ThemeProvider } from '@mui/material';
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { ptBR } from '@mui/x-date-pickers/locales';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/pt-br';
 import { useThemeMode } from '@/components/theme/ThemeContext';
 import ThemeCustom from './ThemeCustom';
 
@@ -18,7 +22,15 @@ export default function ThemeRegistry({ children }: { children: React.ReactNode 
 
   return (
     <CacheProvider value={cache}>
-      <ThemeProvider theme={theme}>{children}</ThemeProvider>
+      <ThemeProvider theme={theme}>
+        <LocalizationProvider
+          dateAdapter={AdapterDayjs}
+          adapterLocale="pt-br"
+          localeText={ptBR.components.MuiLocalizationProvider.defaultProps.localeText}
+        >
+          {children}
+        </LocalizationProvider>
+      </ThemeProvider>
     </CacheProvider>
   );
 }

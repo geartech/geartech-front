@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import Image from 'next/image';
 import { Box, Button, TextField, Typography, InputAdornment, IconButton, Grow } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { AccountCircle, Visibility, VisibilityOff } from '@mui/icons-material';
+import { AccountCircle, Visibility, VisibilityOff, LockOutlined } from '@mui/icons-material';
 import { useAuth } from '@/core/context/AuthProvider';
 import { redirect } from 'next/navigation';
 
@@ -14,13 +14,21 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const darkTheme = createTheme({ palette: { mode: 'dark' } });
+  const darkTheme = createTheme({
+    palette: { mode: 'dark' },
+    typography: {
+      fontFamily: '"Inter","Segoe UI","Roboto",sans-serif',
+    },
+  });
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await login({ username, password });
     redirect('/');
   };
+
+  const inputBg = 'rgba(20,25,38,0.85)';
+  const iconColor = 'rgba(160,175,200,0.6)';
 
   return (
     <ThemeProvider theme={darkTheme}>
@@ -30,7 +38,7 @@ export default function LoginPage() {
         width="100vw"
         overflow="hidden"
       >
-        {/* Vídeo de fundo */}
+        {/* Vídeo */}
         <video
           autoPlay
           loop
@@ -39,8 +47,8 @@ export default function LoginPage() {
           style={{
             position: 'fixed',
             inset: 0,
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            height: '100%',
             objectFit: 'cover',
             zIndex: 0,
           }}
@@ -51,18 +59,18 @@ export default function LoginPage() {
           />
         </video>
 
-        {/* MÁSCARA (acima do vídeo, atrás do form) */}
+        {/* Máscara */}
         <Box
           sx={{
             position: 'fixed',
             inset: 0,
             zIndex: 1,
-            background: 'linear-gradient(180deg, rgba(5,10,20,.75) 0%, rgba(5,10,20,.85) 100%)',
+            background: 'linear-gradient(180deg, rgba(5,10,20,0.55), rgba(5,10,20,0.7))',
             backdropFilter: 'blur(2px)',
           }}
         />
 
-        {/* WRAPPER CENTRALIZADOR (form acima da máscara) */}
+        {/* Conteúdo */}
         <Box
           sx={{
             position: 'relative',
@@ -73,37 +81,66 @@ export default function LoginPage() {
             p: 2,
           }}
         >
-          {/* FORM */}
           <Grow
             in
-            timeout={700}
+            timeout={600}
           >
             <Box
               component="form"
               onSubmit={handleSubmit}
               sx={{
                 p: 4,
-                bgcolor: 'rgba(20,24,34,0.9)',
-                borderRadius: 4,
-                boxShadow: '0 0 14px 4px #11e8ff66',
+                bgcolor: 'rgba(12,16,26,0.92)',
+                borderRadius: 3,
+                border: '1px solid rgba(255,255,255,0.08)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
                 width: '100%',
-                maxWidth: 520,
+                maxWidth: 450,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 2,
-                alignItems: 'stretch',
+                gap: 2.5,
               }}
             >
+              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                <Box
+                  sx={{
+                    width: 360,
+                    height: 360,
+                    borderRadius: '50%',
+                    bgcolor: '#1f303a',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    position: 'relative',
+                  }}
+                >
+                  <Image
+                    src="/agentic.png"
+                    alt="Logo"
+                    width={250}
+                    height={250}
+                    style={{ objectFit: 'contain' }}
+                  />
+                </Box>
+              </Box>
+
               <Typography
                 variant="h5"
-                color="#11e8ff"
-                fontWeight={600}
                 textAlign="center"
-                mb={1}
+                sx={{ color: 'rgba(230,235,245,0.95)' }}
               >
-                Login
+                Do Escopo à CRUDs funcionais.
               </Typography>
 
+              <Typography
+                variant="body2"
+                textAlign="center"
+                sx={{ color: 'rgba(160,170,190,0.8)', mt: -1 }}
+              >
+                Prova de conceito para criação automática de CRUDs com IA.
+              </Typography>
+
+              {/* Usuário */}
               <TextField
                 variant="outlined"
                 size="small"
@@ -112,18 +149,27 @@ export default function LoginPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 fullWidth
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    background: inputBg,
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'rgba(160,170,190,0.7)',
+                  },
+                }}
                 slotProps={{
-                  htmlInput: { maxLength: 40 },
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <AccountCircle sx={{ color: '#11e8ff' }} />
+                        <AccountCircle sx={{ color: iconColor }} />
                       </InputAdornment>
                     ),
                   },
                 }}
               />
 
+              {/* Senha */}
               <TextField
                 variant="outlined"
                 size="small"
@@ -133,20 +179,28 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 fullWidth
                 required
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    borderRadius: 2,
+                    background: inputBg,
+                  },
+                  '& .MuiInputLabel-root': {
+                    color: 'rgba(160,170,190,0.7)',
+                  },
+                }}
                 slotProps={{
-                  htmlInput: { maxLength: 30 },
                   input: {
                     startAdornment: (
                       <InputAdornment position="start">
-                        <AccountCircle sx={{ color: '#11e8ff' }} />
+                        <LockOutlined sx={{ color: iconColor }} />
                       </InputAdornment>
                     ),
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          onClick={handleClickShowPassword}
+                          onClick={() => setShowPassword((v) => !v)}
                           edge="end"
-                          sx={{ color: '#11e8ff' }}
+                          sx={{ color: iconColor }}
                         >
                           {showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
@@ -158,16 +212,20 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
+                size="small"
                 variant="contained"
                 sx={{
-                  width: '50%',
-                  mx: 'auto',
                   mt: 1,
-                  bgcolor: '#0aa7c2',
-                  color: '#fff',
-                  fontWeight: 600,
-                  boxShadow: '0 0 8px #0aa7c277',
-                  '&:hover': { bgcolor: '#088ca3' },
+                  py: 0.3,
+                  borderRadius: 2,
+                  bgcolor: '#1f6fa5',
+                  boxShadow: '0 0 0 1px rgba(80,160,220,0.25)',
+                  fontWeight: 500,
+                  fontSize: 20,
+                  textTransform: 'none',
+                  '&:hover': {
+                    bgcolor: '#2a86c7',
+                  },
                 }}
               >
                 Entrar
@@ -177,7 +235,7 @@ export default function LoginPage() {
         </Box>
       </Box>
 
-      {/* Autofill fix */}
+      {/* 🔥 ÚNICO FIX NECESSÁRIO */}
       <style
         jsx
         global
@@ -186,10 +244,10 @@ export default function LoginPage() {
         input:-webkit-autofill:focus,
         input:-webkit-autofill:hover,
         input:-webkit-autofill:active {
-          -webkit-box-shadow: 0 0 0 1000px #121721 inset !important;
-          -webkit-text-fill-color: #fff !important;
+          -webkit-box-shadow: 0 0 0 1000px rgba(20, 25, 38, 1) inset !important;
+          -webkit-text-fill-color: #e0e5f0 !important;
           transition: background-color 5000s ease-in-out 0s;
-          border-radius: 0 !important; /* remove o raio interno */
+          border-radius: 0 !important;
         }
       `}</style>
     </ThemeProvider>
