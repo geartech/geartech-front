@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-form';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormTimePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> & {
@@ -20,6 +21,7 @@ export function FormTimePicker<TFormValues extends FieldValues>({
   slotProps: customSlotProps,
   ...timePickerProps
 }: FormTimePickerProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -27,6 +29,7 @@ export function FormTimePicker<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
 
   return (
     <Controller
@@ -39,7 +42,7 @@ export function FormTimePicker<TFormValues extends FieldValues>({
       render={({ field }) => (
         <TimePicker
           {...timePickerProps}
-          label={label}
+          label={translatedLabel}
           value={field.value ?? null}
           onChange={(time) => field.onChange(time)}
           disabled={disabled}

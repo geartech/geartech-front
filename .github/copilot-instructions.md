@@ -1,4 +1,5 @@
 # Output rules
+
 - Gere código somente para as tecnologias usadas no projeto React 18.3.1 + typescript 5 + next.js 15.4.7.
 - Siga rigorosamente o padrão do projeto.
 - Nunca gere código para outras tecnologias ou versões diferentes.
@@ -15,3 +16,4 @@
 - Use sempre implementações simples e de fácil leitura e manutenção.
 - Priorize soluções nativas da linguagem antes de sugerir bibliotecas externas.
 - Sempre faça validações se está tudo funcionando compilando o projeto.
+- Sempre faça build para garantir que o código gerado está correto.

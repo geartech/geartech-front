@@ -1,0 +1,28 @@
+{
+  "enum": {
+    "projectType": {
+      "JAVA_SPRING": "Java Spring",
+      "REACT": "React"
+    },
+    "projectStatus": {
+      "PLANNED": "Planned",
+      "IN_PROGRESS": "In Progress",
+      "BLOCKED": "Blocked",
+      "ON_HOLD": "On Hold",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled",
+      "ARCHIVED": "Archived"
+    },
+    "serviceOrderStatus": {
+      "CREATED": "Created",
+      "PENDING": "Pending",
+      "IN_PROGRESS": "In Progress",
+      "COMPLETED": "Completed",
+      "CANCELLED": "Cancelled"
+    },
+    "serviceType": {
+      "CRUD_BACKEND": "CRUD Backend",
+      "MAINTENANCE": "Maintenance"
+    }
+  }
+}

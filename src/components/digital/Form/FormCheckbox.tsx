@@ -5,6 +5,7 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import FormHelperText from '@mui/material/FormHelperText';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormCheckboxProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
@@ -19,6 +20,7 @@ export function FormCheckbox<TFormValues extends FieldValues>({
   rules,
   ...checkboxProps
 }: FormCheckboxProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -26,6 +28,7 @@ export function FormCheckbox<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
 
   return (
     <Controller
@@ -36,7 +39,10 @@ export function FormCheckbox<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <FormControl error={!!fieldError} disabled={disabled}>
+        <FormControl
+          error={!!fieldError}
+          disabled={disabled}
+        >
           <FormControlLabel
             control={
               <Checkbox
@@ -47,11 +53,9 @@ export function FormCheckbox<TFormValues extends FieldValues>({
                 inputRef={field.ref}
               />
             }
-            label={label || ''}
+            label={translatedLabel || ''}
           />
-          {(errorMessage || helperText) && (
-            <FormHelperText>{errorMessage || helperText}</FormHelperText>
-          )}
+          {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
         </FormControl>
       )}
     />

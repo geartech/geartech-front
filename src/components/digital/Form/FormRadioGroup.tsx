@@ -7,6 +7,7 @@ import RadioGroup, { RadioGroupProps } from '@mui/material/RadioGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Radio from '@mui/material/Radio';
 import FormHelperText from '@mui/material/FormHelperText';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export interface RadioOption {
@@ -31,6 +32,7 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
   row,
   ...radioGroupProps
 }: FormRadioGroupProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -38,6 +40,7 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
 
   return (
     <Controller
@@ -48,8 +51,12 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <FormControl error={!!fieldError} disabled={disabled} required={required}>
-          {label && <FormLabel>{label}</FormLabel>}
+        <FormControl
+          error={!!fieldError}
+          disabled={disabled}
+          required={required}
+        >
+          {label && <FormLabel>{translatedLabel}</FormLabel>}
           <RadioGroup
             {...radioGroupProps}
             {...field}
@@ -66,9 +73,7 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
               />
             ))}
           </RadioGroup>
-          {(errorMessage || helperText) && (
-            <FormHelperText>{errorMessage || helperText}</FormHelperText>
-          )}
+          {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
         </FormControl>
       )}
     />

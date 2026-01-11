@@ -45,73 +45,201 @@ export interface UserDTO {
 }
 
 export interface ProjectRequest {
+  code?: string;
   name?: string;
-  type?: "JAVA_SPRING" | "REACT";
+  type?: ProjectRequestTypeEnum;
   technology?: string;
   description?: string;
   repoUrl?: string;
-  status?:
-    | "PLANNED"
-    | "IN_PROGRESS"
-    | "BLOCKED"
-    | "ON_HOLD"
-    | "COMPLETED"
-    | "CANCELLED"
-    | "ARCHIVED";
 }
 
-export interface ProjectDTO {
-  /** @format int64 */
-  id?: number;
-  name?: string;
-  type?: "JAVA_SPRING" | "REACT";
-  technology?: string;
-  description?: string;
-  repoUrl?: string;
-  status?:
-    | "PLANNED"
-    | "IN_PROGRESS"
-    | "BLOCKED"
-    | "ON_HOLD"
-    | "COMPLETED"
-    | "CANCELLED"
-    | "ARCHIVED";
-}
-
-export interface AnalyzeRequest {
-  /** @format int64 */
-  idProject: number;
-  /** @minLength 1 */
-  repoUrl: string;
-  /** @minLength 1 */
-  branch: string;
-}
-
-export interface AnalyzeResponse {
-  moduleDir?: string;
-  module?: string;
-  basePackage?: string;
-  build?: BuildInfo;
-  database?: DatabaseInfo;
-  architecture?: ArchitectureInfo;
-  counts?: Record<string, number>;
-  starters?: string[];
-  notes?: string[];
-  packages?: Record<string, string[]>;
-}
-
-export interface ArchitectureInfo {
+export interface ArchitectureInfoRecord {
   type?: string;
   signals?: string[];
 }
 
-export interface BuildInfo {
-  tool?: string;
-  language?: string;
-  dependencies?: string[];
+export interface AstAnnotationRecord {
+  name?: string;
+  attrs?: Record<string, string>;
 }
 
-export interface DatabaseInfo {
+export interface AstConfigurationRecord {
+  fqn?: string;
+  simpleName?: string;
+  beanMethods?: AstMethodRecord[];
+  annotations?: AstAnnotationRecord[];
+  classSourceCode?: string;
+}
+
+export interface AstControllerRecord {
+  fqn?: string;
+  basePath?: string;
+  endpoints?: AstEndpointRecord[];
+  classSourceCode?: string;
+}
+
+export interface AstDtoRecord {
+  fqn?: string;
+  simpleName?: string;
+  fields?: AstFieldRecord[];
+  annotations?: AstAnnotationRecord[];
+  isRecord?: boolean;
+  classSourceCode?: string;
+}
+
+export interface AstEndpointRecord {
+  httpMethod?: string;
+  path?: string;
+  produces?: string;
+  consumes?: string;
+  methodName?: string;
+  returnType?: string;
+  paramTypes?: string[];
+  sourceCode?: string;
+}
+
+export interface AstEntityRecord {
+  fqn?: string;
+  simpleName?: string;
+  table?: string;
+  annotations?: AstAnnotationRecord[];
+  fields?: AstFieldRecord[];
+  relations?: AstRelationRecord[];
+  classSourceCode?: string;
+}
+
+export interface AstEnumRecord {
+  fqn?: string;
+  simpleName?: string;
+  values?: string[];
+  enumSourceCode?: string;
+}
+
+export interface AstExceptionRecord {
+  fqn?: string;
+  simpleName?: string;
+  extendsClass?: string;
+  fields?: AstFieldRecord[];
+  constructors?: AstMethodRecord[];
+  classSourceCode?: string;
+}
+
+export interface AstFieldRecord {
+  name?: string;
+  type?: string;
+  annotations?: AstAnnotationRecord[];
+  id?: boolean;
+  column?: string;
+  nullable?: boolean;
+}
+
+export interface AstMapperMyBatisJavaRecord {
+  fqn?: string;
+  methods?: AstMethodRecord[];
+  classSourceCode?: string;
+}
+
+export interface AstMapperMyBatisXmlRecord {
+  namespace?: string;
+  statements?: AstSqlStatementRecord[];
+  filePath?: string;
+  xmlContent?: string;
+}
+
+export interface AstMethodRecord {
+  name?: string;
+  returnType?: string;
+  paramTypes?: string[];
+  annotations?: AstAnnotationRecord[];
+  transactional?: boolean;
+  transactionalProp?: string;
+  sourceCode?: string;
+}
+
+export interface AstPackageRecord {
+  name?: string;
+  typesFqn?: string[];
+}
+
+export interface AstProjectRecord {
+  moduleDir?: string;
+  basePackage?: string;
+  packages?: AstPackageRecord[];
+  entities?: AstEntityRecord[];
+  repositories?: AstRepositoryRecord[];
+  services?: AstServiceRecord[];
+  controllers?: AstControllerRecord[];
+  testControllers?: AstControllerRecord[];
+  mappersMyBatisJava?: AstMapperMyBatisJavaRecord[];
+  mappersMyBatisXml?: AstMapperMyBatisXmlRecord[];
+  dtos?: AstDtoRecord[];
+  exceptions?: AstExceptionRecord[];
+  configurations?: AstConfigurationRecord[];
+  enums?: AstEnumRecord[];
+  properties?: string[];
+  sqlScripts?: string[];
+  tests?: AstTestRecord[];
+}
+
+export interface AstRelationKindRecord {
+  value?: string;
+}
+
+export interface AstRelationRecord {
+  kind?: AstRelationKindRecord;
+  targetType?: string;
+  mappedBy?: string;
+  joinColumn?: string;
+  joinTable?: string;
+}
+
+export interface AstRepositoryRecord {
+  fqn?: string;
+  entityType?: string;
+  idType?: string;
+  classSourceCode?: string;
+}
+
+export interface AstServiceRecord {
+  fqn?: string;
+  methods?: AstMethodRecord[];
+  hasTransactionalClassLevel?: boolean;
+  classSourceCode?: string;
+}
+
+export interface AstSqlStatementRecord {
+  id?: string;
+  kind?: string;
+  parameterType?: string;
+  resultType?: string;
+}
+
+export interface AstTestRecord {
+  fqn?: string;
+  simpleName?: string;
+  testMethods?: AstMethodRecord[];
+  annotations?: AstAnnotationRecord[];
+  testedClass?: string;
+  classSourceCode?: string;
+}
+
+export interface BasePackageRecord {
+  main?: MainJavaRecord;
+  test?: TestJavaRecord;
+  resources?: MainResourcesRecord;
+}
+
+export interface BuildInfoRecord {
+  tool?: string;
+  language?: string;
+  languageVersion?: string;
+  buildToolVersion?: string;
+  springBootVersion?: string;
+  dependencies?: string[];
+  depVersions?: Record<string, string>;
+}
+
+export interface DatabaseInfoRecord {
   name?: string;
   inferredFrom?: string;
   jdbcUrl?: string;
@@ -121,11 +249,94 @@ export interface DatabaseInfo {
   password?: string;
 }
 
-export interface AuthRequest {
-  /** @minLength 1 */
-  username: string;
-  /** @minLength 1 */
-  password: string;
+export interface MainJavaRecord {
+  dto?: string[];
+  dtoRequest?: string[];
+  entity?: string[];
+  repository?: string[];
+  service?: string[];
+  controller?: string[];
+  exception?: string[];
+  config?: string[];
+  enumType?: string[];
+  mapper_mapstruct?: string[];
+  mapper_mybatis_java?: string[];
+  util?: string[];
+}
+
+export interface MainResourcesRecord {
+  properties?: string[];
+  mapper_mybatis_xml?: string[];
+  sql?: string[];
+}
+
+export interface PackageStructureRecord {
+  basePackage?: BasePackageRecord;
+}
+
+export interface ProjectDTO {
+  /** @format int64 */
+  id?: number;
+  name?: string;
+  type?: ProjectDtoTypeEnum;
+  technology?: string;
+  description?: string;
+  repoUrl?: string;
+  status?: ProjectDtoStatusEnum;
+}
+
+export interface ProjectInfoRecord {
+  moduleDir?: string;
+  module?: string;
+  basePackage?: string;
+  build?: BuildInfoRecord;
+  database?: DatabaseInfoRecord;
+  architecture?: ArchitectureInfoRecord;
+  counts?: Record<string, number>;
+  starters?: string[];
+  notes?: string[];
+  packages?: PackageStructureRecord;
+}
+
+export interface ProjectInfoResponse {
+  project?: ProjectDTO;
+  info?: ProjectInfoRecord;
+  ast?: AstProjectRecord;
+}
+
+export interface TestJavaRecord {
+  controller?: string[];
+  util?: string[];
+  config?: string[];
+}
+
+export interface ServiceOrderDTO {
+  /** @format int64 */
+  id?: number;
+  /** @format int64 */
+  projectId?: number;
+  code?: string;
+  title?: string;
+  description?: string;
+  status?: ServiceOrderDtoStatusEnum;
+  serviceType?: ServiceOrderDtoServiceTypeEnum;
+  cardsSummary?: string;
+  /** @format int32 */
+  totalCards?: number;
+  /** @format int32 */
+  cardsDone?: number;
+  /** @format int32 */
+  cardsFailed?: number;
+  /** @format int32 */
+  cardsBlocked?: number;
+  /** @format int64 */
+  totalTokensUsed?: number;
+  /** @format int64 */
+  totalProcessingTimeMs?: number;
+  /** @format date-time */
+  executionStartedAt?: string;
+  /** @format date-time */
+  executionCompletedAt?: string;
 }
 
 export interface SearchProjectRequest {
@@ -134,16 +345,9 @@ export interface SearchProjectRequest {
   /** @format date */
   endDate?: string;
   name?: string;
-  projectType?: "JAVA_SPRING" | "REACT";
+  projectType?: SearchProjectRequestProjectTypeEnum;
   description?: string;
-  projectStatus?:
-    | "PLANNED"
-    | "IN_PROGRESS"
-    | "BLOCKED"
-    | "ON_HOLD"
-    | "COMPLETED"
-    | "CANCELLED"
-    | "ARCHIVED";
+  projectStatus?: SearchProjectRequestProjectStatusEnum;
   /** @format int32 */
   pageNum?: number;
   /** @format int32 */
@@ -183,6 +387,13 @@ export interface PageInfoProjectDTO {
   navigateLastPage?: number;
 }
 
+export interface AuthRequest {
+  /** @minLength 1 */
+  username: string;
+  /** @minLength 1 */
+  password: string;
+}
+
 export interface UserLoginDTO {
   /** @format int64 */
   id?: number;
@@ -193,6 +404,59 @@ export interface UserLoginDTO {
   phone?: string;
   active?: boolean;
   permissions?: string[];
+}
+
+export enum ProjectRequestTypeEnum {
+  JAVA_SPRING = "JAVA_SPRING",
+  REACT = "REACT",
+}
+
+export enum ProjectDtoTypeEnum {
+  JAVA_SPRING = "JAVA_SPRING",
+  REACT = "REACT",
+}
+
+export enum ProjectDtoStatusEnum {
+  PLANNED = "PLANNED",
+  IN_PROGRESS = "IN_PROGRESS",
+  BLOCKED = "BLOCKED",
+  ON_HOLD = "ON_HOLD",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  ARCHIVED = "ARCHIVED",
+}
+
+export enum ServiceOrderDtoStatusEnum {
+  CREATED = "CREATED",
+  PENDING = "PENDING",
+  IN_PROGRESS = "IN_PROGRESS",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+}
+
+export enum ServiceOrderDtoServiceTypeEnum {
+  CRUD_BACKEND = "CRUD_BACKEND",
+  MAINTENANCE = "MAINTENANCE",
+}
+
+export enum SearchProjectRequestProjectTypeEnum {
+  JAVA_SPRING = "JAVA_SPRING",
+  REACT = "REACT",
+}
+
+export enum SearchProjectRequestProjectStatusEnum {
+  PLANNED = "PLANNED",
+  IN_PROGRESS = "IN_PROGRESS",
+  BLOCKED = "BLOCKED",
+  ON_HOLD = "ON_HOLD",
+  COMPLETED = "COMPLETED",
+  CANCELLED = "CANCELLED",
+  ARCHIVED = "ARCHIVED",
+}
+
+export enum CreateServiceOrderParamsServiceTypeEnum {
+  CRUD_BACKEND = "CRUD_BACKEND",
+  MAINTENANCE = "MAINTENANCE",
 }
 
 import type {
@@ -454,9 +718,25 @@ export class Api<
       data: ProjectRequest,
       params: RequestParams = {},
     ) =>
-      this.request<ProjectDTO, any>({
+      this.request<ProjectInfoResponse, any>({
         path: `/project/update/${id}`,
         method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags project-controller
+     * @name ListProjects
+     * @request POST:/project/list
+     */
+    listProjects: (data: SearchProjectRequest, params: RequestParams = {}) =>
+      this.request<PageInfoProjectDTO, any>({
+        path: `/project/list`,
+        method: "POST",
         body: data,
         type: ContentType.Json,
         ...params,
@@ -470,41 +750,9 @@ export class Api<
      * @request POST:/project/create
      */
     createProject: (data: ProjectRequest, params: RequestParams = {}) =>
-      this.request<ProjectDTO, any>({
+      this.request<ProjectInfoResponse, any>({
         path: `/project/create`,
         method: "POST",
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags project-controller
-     * @name Analyze
-     * @request POST:/project/analyze
-     */
-    analyze: (data: AnalyzeRequest, params: RequestParams = {}) =>
-      this.request<AnalyzeResponse, any>({
-        path: `/project/analyze`,
-        method: "POST",
-        body: data,
-        type: ContentType.Json,
-        ...params,
-      }),
-
-    /**
-     * No description
-     *
-     * @tags project-controller
-     * @name GetAllProjects
-     * @request GET:/project/list
-     */
-    getAllProjects: (data: SearchProjectRequest, params: RequestParams = {}) =>
-      this.request<PageInfoProjectDTO, any>({
-        path: `/project/list`,
-        method: "GET",
         body: data,
         type: ContentType.Json,
         ...params,
@@ -538,6 +786,65 @@ export class Api<
         ...params,
       }),
   };
+  serviceOrder = {
+    /**
+     * No description
+     *
+     * @tags service-order-controller
+     * @name CreateServiceOrder
+     * @request POST:/service-order/create
+     */
+    createServiceOrder: (
+      query: {
+        /** @format int64 */
+        idProject: number;
+        title: string;
+        description?: string;
+        serviceType: CreateServiceOrderParamsServiceTypeEnum;
+      },
+      data: {
+        /** @format binary */
+        file: File;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<ServiceOrderDTO, any>({
+        path: `/service-order/create`,
+        method: "POST",
+        query: query,
+        body: data,
+        type: ContentType.FormData,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags service-order-controller
+     * @name GetByIdServiceOrder
+     * @request GET:/service-order/get/{id}
+     */
+    getByIdServiceOrder: (id: string, params: RequestParams = {}) =>
+      this.request<ServiceOrderDTO, any>({
+        path: `/service-order/get/${id}`,
+        method: "GET",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags service-order-controller
+     * @name DeleteServiceOrder
+     * @request DELETE:/service-order/delete/{id}
+     */
+    deleteServiceOrder: (id: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/service-order/delete/${id}`,
+        method: "DELETE",
+        ...params,
+      }),
+  };
   card = {
     /**
      * No description
@@ -547,9 +854,23 @@ export class Api<
      * @request POST:/card/start/{idCard}
      */
     startCard: (idCard: number, params: RequestParams = {}) =>
-      this.request<void, any>({
+      this.request<Record<string, string>, any>({
         path: `/card/start/${idCard}`,
         method: "POST",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags card-controller
+     * @name GetExecutionStatus
+     * @request GET:/card/execution/{executionId}
+     */
+    getExecutionStatus: (executionId: string, params: RequestParams = {}) =>
+      this.request<object, any>({
+        path: `/card/execution/${executionId}`,
+        method: "GET",
         ...params,
       }),
   };

@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-form';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormInputProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
@@ -16,6 +17,7 @@ export function FormInput<TFormValues extends FieldValues>({
   rules,
   ...textFieldProps
 }: FormInputProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -23,6 +25,9 @@ export function FormInput<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
+  const translatedPlaceholder =
+    typeof textFieldProps.placeholder === 'string' ? t(textFieldProps.placeholder) : textFieldProps.placeholder;
 
   return (
     <Controller
@@ -37,7 +42,8 @@ export function FormInput<TFormValues extends FieldValues>({
           {...textFieldProps}
           {...field}
           size="small"
-          label={label}
+          label={translatedLabel}
+          placeholder={translatedPlaceholder}
           required={required}
           disabled={disabled}
           error={!!fieldError}

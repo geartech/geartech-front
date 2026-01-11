@@ -6,6 +6,7 @@ import InputLabel from '@mui/material/InputLabel';
 import Select, { SelectProps } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export interface SelectOption {
@@ -33,6 +34,7 @@ export function FormSelect<TFormValues extends FieldValues>({
   fullWidth = true,
   ...selectProps
 }: FormSelectProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -41,6 +43,8 @@ export function FormSelect<TFormValues extends FieldValues>({
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
   const labelId = `${name}-label`;
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
+  const translatedPlaceholder = typeof placeholder === 'string' ? t(placeholder) : placeholder;
 
   return (
     <Controller
@@ -51,31 +55,41 @@ export function FormSelect<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <FormControl fullWidth={fullWidth} error={!!fieldError} disabled={disabled} required={required}>
-          {label && <InputLabel id={labelId}>{label}</InputLabel>}
+        <FormControl
+          fullWidth={fullWidth}
+          error={!!fieldError}
+          disabled={disabled}
+          required={required}
+        >
+          {label && <InputLabel id={labelId}>{translatedLabel}</InputLabel>}
           <Select
             {...selectProps}
             {...field}
             size="small"
             labelId={labelId}
-            label={label}
+            label={translatedLabel}
             value={field.value ?? ''}
-            displayEmpty={!!placeholder}
+            displayEmpty={!!translatedPlaceholder}
           >
-            {placeholder && (
-              <MenuItem value="" disabled>
-                <em>{placeholder}</em>
+            {translatedPlaceholder && (
+              <MenuItem
+                value=""
+                disabled
+              >
+                <em>{translatedPlaceholder}</em>
               </MenuItem>
             )}
             {options.map((option) => (
-              <MenuItem key={option.value} value={option.value} disabled={option.disabled}>
+              <MenuItem
+                key={option.value}
+                value={option.value}
+                disabled={option.disabled}
+              >
                 {option.label}
               </MenuItem>
             ))}
           </Select>
-          {(errorMessage || helperText) && (
-            <FormHelperText>{errorMessage || helperText}</FormHelperText>
-          )}
+          {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
         </FormControl>
       )}
     />

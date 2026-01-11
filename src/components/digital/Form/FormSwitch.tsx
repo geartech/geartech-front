@@ -5,6 +5,7 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch, { SwitchProps } from '@mui/material/Switch';
 import FormHelperText from '@mui/material/FormHelperText';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormSwitchProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
@@ -22,6 +23,7 @@ export function FormSwitch<TFormValues extends FieldValues>({
   labelPlacement = 'end',
   ...switchProps
 }: FormSwitchProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -29,6 +31,7 @@ export function FormSwitch<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
 
   return (
     <Controller
@@ -39,9 +42,13 @@ export function FormSwitch<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <FormControl error={!!fieldError} disabled={disabled}>
+        <FormControl
+          error={!!fieldError}
+          disabled={disabled}
+        >
           <FormControlLabel
             labelPlacement={labelPlacement}
+            label={translatedLabel}
             control={
               <Switch
                 {...switchProps}
@@ -51,11 +58,8 @@ export function FormSwitch<TFormValues extends FieldValues>({
                 inputRef={field.ref}
               />
             }
-            label={label || ''}
           />
-          {(errorMessage || helperText) && (
-            <FormHelperText>{errorMessage || helperText}</FormHelperText>
-          )}
+          {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
         </FormControl>
       )}
     />

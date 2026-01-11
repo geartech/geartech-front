@@ -1,6 +1,8 @@
-import PieChartIcon from '@mui/icons-material/PieChart';
-import Settings from '@mui/icons-material/Settings';
 import { Home } from '@mui/icons-material';
+import Workspaces from '@mui/icons-material/Workspaces';
+import Settings from '@mui/icons-material/Settings';
+import BarChart from '@mui/icons-material/BarChart';
+import SmartToy from '@mui/icons-material/SmartToy';
 
 interface MenuItemProps {
   text: string;
@@ -14,26 +16,68 @@ export const menuItems: MenuItemProps[] = [
   {
     text: 'Home',
     icon: <Home sx={{ fontSize: 22 }} />,
-    href: '/pages/auth/home',
+    href: '/pages/auth/dashboard/ProjectDash',
   },
   {
-    text: 'Dashboard',
-    icon: <PieChartIcon sx={{ fontSize: 20 }} />,
+    text: 'Workspace',
+    icon: <Workspaces sx={{ fontSize: 20 }} />,
+    permission: ['ADM', 'WORKSPACE_ACCESS'],
+    children: [
+      {
+        text: 'Projetos',
+        href: '/pages/auth/settings/project/ProjectList',
+        permission: ['ADM', 'PROJECT_ACCESS'],
+      },
+      {
+        text: 'Ordens De Serviço',
+        href: '/pages/auth/settings/serviceOrder/ServiceOrderList',
+        permission: ['ADM', 'PROJECT_ACCESS'],
+      },
+      {
+        text: 'Sprints',
+        href: '/pages/auth/settings/sprint/SprintList',
+        permission: ['ADM', 'PROJECT_ACCESS'],
+      },
+      {
+        text: 'Tarefas',
+        href: '/pages/auth/settings/task/TaskList',
+        permission: ['ADM', 'PROJECT_ACCESS'],
+      },
+    ],
+  },
+  {
+    text: 'Dashboards',
+    icon: <BarChart sx={{ fontSize: 20 }} />,
     permission: ['ADM', 'DASHBOARD_ACCESS'],
     children: [
       {
-        text: 'Projects',
+        text: 'Projetos',
         href: '/pages/auth/dashboard/ProjectDash',
         permission: ['ADM', 'PROJECT_DASHBOARD'],
       },
     ],
   },
   {
-    text: 'Settings',
-    icon: <Settings sx={{ fontSize: 20 }} />,
+    text: 'Automações / IA',
+    icon: <SmartToy sx={{ fontSize: 20 }} />,
     permission: ['ADM', 'SETTINGS_ACCESS'],
     children: [
       { text: 'Projects', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+    ],
+  },
+  {
+    text: 'Configurações',
+    icon: <Settings sx={{ fontSize: 20 }} />,
+    permission: ['ADM', 'SETTINGS_ACCESS'],
+    children: [
+      { text: 'Regras', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Integrações', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Usuários', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      {
+        text: 'Templates / Fluxos',
+        href: '/pages/auth/settings/project/ProjectList',
+        permission: ['ADM', 'PROJECT_ACCESS'],
+      },
     ],
   },
 ];

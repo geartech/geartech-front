@@ -15,7 +15,7 @@ import type { BoxProps } from '@mui/material/Box';
  */
 export interface FormProps<TFormValues extends FieldValues> extends Omit<UseFormProps<TFormValues>, 'defaultValues'> {
   defaultValues?: DefaultValues<TFormValues>;
-  onSubmit: SubmitHandler<TFormValues>;
+  onSubmit?: SubmitHandler<TFormValues>;
   children: ReactNode;
   id?: string;
   className?: string;

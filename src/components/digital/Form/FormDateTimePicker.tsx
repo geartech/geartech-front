@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-form';
 import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormDateTimePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
@@ -19,6 +20,7 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
   fullWidth = true,
   ...dateTimePickerProps
 }: FormDateTimePickerProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -26,6 +28,7 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
 
   return (
     <Controller
@@ -38,7 +41,7 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
       render={({ field }) => (
         <DateTimePicker
           {...dateTimePickerProps}
-          label={label}
+          label={translatedLabel}
           ampm={false}
           value={field.value ?? null}
           onChange={(date) => field.onChange(date)}

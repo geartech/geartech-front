@@ -2,6 +2,7 @@
 
 import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-form';
 import { DatePicker, DatePickerProps } from '@mui/x-date-pickers/DatePicker';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormDatePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
@@ -19,6 +20,7 @@ export function FormDatePicker<TFormValues extends FieldValues>({
   fullWidth = true,
   ...datePickerProps
 }: FormDatePickerProps<TFormValues>) {
+  const { t } = useTranslation();
   const {
     control,
     formState: { errors },
@@ -26,6 +28,7 @@ export function FormDatePicker<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
 
   return (
     <Controller
@@ -38,7 +41,7 @@ export function FormDatePicker<TFormValues extends FieldValues>({
       render={({ field }) => (
         <DatePicker
           {...datePickerProps}
-          label={label}
+          label={translatedLabel}
           value={field.value ?? null}
           onChange={(date) => field.onChange(date)}
           disabled={disabled}

@@ -72,3 +72,75 @@ applyCustomInterceptors(geartechApi.instance);
 
 // Apenas use geartechApi no app inteiro:
 // await geartechApi.auth.login({ username: '...', password: '...' });
+
+// ===== Exportação dos Enums =====
+// Re-exporte os enums gerados pelo swagger-typescript-api
+export {
+  // Enums de status
+  ProjectDtoStatusEnum,
+  SearchProjectRequestProjectStatusEnum,
+  ServiceOrderDtoStatusEnum,
+  // Enums de tipo
+  ContentType,
+  CreateServiceOrderParamsServiceTypeEnum,
+  ProjectDtoTypeEnum,
+  ProjectRequestTypeEnum,
+  SearchProjectRequestProjectTypeEnum,
+  ServiceOrderDtoServiceTypeEnum,
+} from './api';
+
+// ===== Exportação dos Types =====
+// Re-exporte os type aliases gerados pelo swagger-typescript-api
+export type { QueryParamsType, RequestParams } from './api';
+
+// ===== Exportação dos DTOs =====
+// Re-exporte os tipos DTO gerados pelo swagger-typescript-api
+export type {
+  // DTOs principais
+  ProjectDTO,
+  ServiceOrderDTO,
+  UserDTO,
+  // DTOs especiais
+  PageInfoProjectDTO,
+  UserLoginDTO,
+  // Requests
+  AuthRequest,
+  ProjectRequest,
+  SearchProjectRequest,
+  UserRequest,
+  // Records de AST
+  AstAnnotationRecord,
+  AstConfigurationRecord,
+  AstControllerRecord,
+  AstDtoRecord,
+  AstEndpointRecord,
+  AstEntityRecord,
+  AstEnumRecord,
+  AstExceptionRecord,
+  AstFieldRecord,
+  AstMapperMyBatisJavaRecord,
+  AstMapperMyBatisXmlRecord,
+  AstMethodRecord,
+  AstPackageRecord,
+  AstProjectRecord,
+  AstRelationKindRecord,
+  AstRelationRecord,
+  AstRepositoryRecord,
+  AstServiceRecord,
+  AstSqlStatementRecord,
+  AstTestRecord,
+  // Records de arquitetura
+  ArchitectureInfoRecord,
+  BuildInfoRecord,
+  DatabaseInfoRecord,
+  ProjectInfoRecord,
+  // Records de estrutura
+  BasePackageRecord,
+  MainJavaRecord,
+  MainResourcesRecord,
+  TestJavaRecord,
+  // Outros tipos
+  ApiConfig,
+  FullRequestParams,
+  ProjectInfoResponse,
+} from './api';

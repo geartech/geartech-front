@@ -1,23 +1,13 @@
 'use client';
 
-import { useFormContext } from 'react-hook-form';
-import Button, { ButtonProps } from '@mui/material/Button';
+import MuiButton, { ButtonProps as MuiButtonProps } from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ReactNode } from 'react';
 import { SxProps, Theme } from '@mui/material/styles';
 
-export type FormButtonType =
-  | 'button'
-  | 'submit'
-  | 'success'
-  | 'reset'
-  | 'cancel'
-  | 'delete'
-  | 'back'
-  | 'info'
-  | 'warning';
+export type ButtonType = 'button' | 'submit' | 'success' | 'reset' | 'cancel' | 'delete' | 'back' | 'info' | 'warning';
 
-export type FormButtonColor = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'inherit';
+export type ButtonColor = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'inherit';
 
 // =============================
 // PALETA UX CORPORATIVA
@@ -35,9 +25,9 @@ const buttonColors = {
 
 // Configuração padrão por buttonType
 const BUTTON_TYPE_CONFIG: Record<
-  FormButtonType,
+  ButtonType,
   {
-    color: FormButtonColor;
+    color: ButtonColor;
     variant: ButtonProps['variant'];
     htmlType: 'button' | 'submit';
     disableOnSubmitting: boolean;
@@ -144,24 +134,15 @@ const BUTTON_TYPE_CONFIG: Record<
   },
 };
 
-export interface FormButtonProps extends Omit<ButtonProps, 'color' | 'type' | 'onClick'> {
+export interface ButtonProps extends Omit<MuiButtonProps, 'color' | 'type'> {
   children: ReactNode;
-  buttonType?: FormButtonType;
+  buttonType?: ButtonType;
   loading?: boolean;
   loadingText?: string;
-  color?: FormButtonColor;
-  disableOnSubmitting?: boolean;
-  onClick?: (data: unknown) => void | Promise<void>;
-  onCancel?: () => void;
-  onDelete?: () => void | Promise<void>;
-  onBack?: () => void;
-  onInfo?: () => void;
-  onWarning?: () => void;
-  confirmMessage?: string;
-  keepDefaultValues?: boolean;
+  color?: ButtonColor;
 }
 
-export function FormButton({
+export function Button({
   children,
   buttonType = 'button',
   loading = false,
@@ -169,93 +150,30 @@ export function FormButton({
   color,
   variant,
   disabled,
-  disableOnSubmitting,
   onClick,
-  onCancel,
-  onDelete,
-  onBack,
-  onInfo,
-  onWarning,
-  confirmMessage,
-  keepDefaultValues = true,
   sx,
   ...buttonProps
-}: FormButtonProps) {
-  const formContext = useFormContext();
-  const isSubmitting = formContext?.formState?.isSubmitting || false;
-
+}: ButtonProps) {
   const config = BUTTON_TYPE_CONFIG[buttonType];
 
   // Props finais (usuário pode sobrescrever)
   const finalColor = color ?? config.color;
   const finalVariant = variant ?? config.variant;
-  const finalDisableOnSubmitting = disableOnSubmitting ?? config.disableOnSubmitting;
   const finalHtmlType = config.htmlType;
 
   // Merge sx: config.sx + sx do usuário
   const finalSx: SxProps<Theme> = [config.sx || {}, ...(Array.isArray(sx) ? sx : [sx])];
 
-  const isLoading = loading || (finalDisableOnSubmitting && isSubmitting);
-
-  const handleClick = async () => {
-    // Botões que não precisam validar o form
-    if (buttonType === 'reset') {
-      if (keepDefaultValues) {
-        formContext?.reset();
-      } else {
-        formContext?.reset({});
-      }
-      return;
-    }
-
-    if (buttonType === 'cancel') {
-      onCancel?.();
-      return;
-    }
-
-    if (buttonType === 'back') {
-      onBack?.();
-      return;
-    }
-
-    if (buttonType === 'delete') {
-      if (confirmMessage) {
-        const confirmed = window.confirm(confirmMessage);
-        if (!confirmed) return;
-      }
-      await onDelete?.();
-      // Delete também passa os dados do form (sem validar)
-      if (formContext && onClick) {
-        const formData = formContext.getValues();
-        await onClick?.(formData);
-      }
-      return;
-    }
-
-    // Para todos os outros tipos, valida o form antes de chamar onClick
-    if (formContext) {
-      const isValid = await formContext.trigger(); // Valida todos os campos
-      if (!isValid) return; // Se não for válido, não executa onClick
-    }
-
-    // Chama callbacks específicos
-    if (buttonType === 'info') onInfo?.();
-    if (buttonType === 'warning') onWarning?.();
-
-    // Para todos os botões que validam, passa os dados do form como parâmetro
-    if (formContext && onClick) {
-      const formData = formContext.getValues();
-      await onClick?.(formData);
-    }
-  };
+  const isLoading = loading;
 
   return (
-    <Button
+    <MuiButton
       type={finalHtmlType}
       variant={finalVariant}
+      size="small"
       color={finalColor}
       disabled={disabled || isLoading}
-      onClick={handleClick}
+      onClick={onClick}
       sx={finalSx}
       {...buttonProps}
     >
@@ -271,6 +189,6 @@ export function FormButton({
       ) : (
         children
       )}
-    </Button>
+    </MuiButton>
   );
 }

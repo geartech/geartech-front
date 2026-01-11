@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Box, Button, TextField, Typography, InputAdornment, IconButton, Grow } from '@mui/material';
+import { Box, Button, TextField, Typography, InputAdornment, IconButton, Grow, Divider } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { AccountCircle, Visibility, VisibilityOff, LockOutlined } from '@mui/icons-material';
 import { useAuth } from '@/core/context/AuthProvider';
@@ -95,17 +95,26 @@ export default function LoginPage() {
                 border: '1px solid rgba(255,255,255,0.08)',
                 boxShadow: '0 8px 32px rgba(0,0,0,0.5)',
                 width: '100%',
-                maxWidth: 450,
+                maxWidth: 750,
                 display: 'flex',
-                flexDirection: 'column',
-                gap: 2.5,
+                flexDirection: 'row',
+                gap: 4,
+                alignItems: 'center',
               }}
             >
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+              {/* Logo */}
+              <Box
+                sx={{
+                  flex: '0 0 auto',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
                 <Box
                   sx={{
-                    width: 360,
-                    height: 360,
+                    width: 285,
+                    height: 285,
                     borderRadius: '50%',
                     bgcolor: '#1f303a',
                     display: 'flex',
@@ -117,119 +126,144 @@ export default function LoginPage() {
                   <Image
                     src="/agentic.png"
                     alt="Logo"
-                    width={250}
-                    height={250}
+                    width={200}
+                    height={200}
                     style={{ objectFit: 'contain' }}
                   />
                 </Box>
               </Box>
 
-              <Typography
-                variant="h5"
-                textAlign="center"
-                sx={{ color: 'rgba(230,235,245,0.95)' }}
-              >
-                Do Escopo à CRUDs funcionais.
-              </Typography>
-
-              <Typography
-                variant="body2"
-                textAlign="center"
-                sx={{ color: 'rgba(160,170,190,0.8)', mt: -1 }}
-              >
-                Prova de conceito para criação automática de CRUDs com IA.
-              </Typography>
-
-              {/* Usuário */}
-              <TextField
-                variant="outlined"
-                size="small"
-                label="Usuário"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                fullWidth
-                required
+              {/* Form Content */}
+              <Box
                 sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    background: inputBg,
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(160,170,190,0.7)',
-                  },
-                }}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <AccountCircle sx={{ color: iconColor }} />
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-
-              {/* Senha */}
-              <TextField
-                variant="outlined"
-                size="small"
-                label="Senha"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                fullWidth
-                required
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    borderRadius: 2,
-                    background: inputBg,
-                  },
-                  '& .MuiInputLabel-root': {
-                    color: 'rgba(160,170,190,0.7)',
-                  },
-                }}
-                slotProps={{
-                  input: {
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <LockOutlined sx={{ color: iconColor }} />
-                      </InputAdornment>
-                    ),
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          onClick={() => setShowPassword((v) => !v)}
-                          edge="end"
-                          sx={{ color: iconColor }}
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  },
-                }}
-              />
-
-              <Button
-                type="submit"
-                size="small"
-                variant="contained"
-                sx={{
-                  mt: 1,
-                  py: 0.3,
-                  borderRadius: 2,
-                  bgcolor: '#1f6fa5',
-                  boxShadow: '0 0 0 1px rgba(80,160,220,0.25)',
-                  fontWeight: 500,
-                  fontSize: 20,
-                  textTransform: 'none',
-                  '&:hover': {
-                    bgcolor: '#2a86c7',
-                  },
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 2.5,
+                  minWidth: 280,
                 }}
               >
-                Entrar
-              </Button>
+                <Typography
+                  variant="h5"
+                  textAlign="center"
+                  sx={{ color: 'rgba(230,235,245,0.95)' }}
+                >
+                  [ PROVA DE CONCEITO ]
+                  <br /> Do Escopo à CRUDs funcionais.
+                </Typography>
+
+                <Typography
+                  variant="body2"
+                  textAlign="center"
+                  sx={{ color: 'rgba(160,170,190,0.8)', mt: -1 }}
+                >
+                  Backend, frontend, testes e documentação automáticos.
+                </Typography>
+
+                <Divider sx={{ borderColor: 'rgba(255,255,255,0.1)' }} />
+
+                {/* Inputs e Button Container */}
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2.5,
+                    maxWidth: 280,
+                    margin: '0 auto',
+                  }}
+                >
+                  {/* Usuário */}
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    label="Usuário"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    fullWidth
+                    required
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        background: inputBg,
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: 'rgba(160,170,190,0.7)',
+                      },
+                    }}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <AccountCircle sx={{ color: iconColor }} />
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+
+                  {/* Senha */}
+                  <TextField
+                    variant="outlined"
+                    size="small"
+                    label="Senha"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    fullWidth
+                    required
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        borderRadius: 2,
+                        background: inputBg,
+                      },
+                      '& .MuiInputLabel-root': {
+                        color: 'rgba(160,170,190,0.7)',
+                      },
+                    }}
+                    slotProps={{
+                      input: {
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <LockOutlined sx={{ color: iconColor }} />
+                          </InputAdornment>
+                        ),
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword((v) => !v)}
+                              edge="end"
+                              sx={{ color: iconColor }}
+                            >
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      },
+                    }}
+                  />
+
+                  <Button
+                    type="submit"
+                    size="small"
+                    variant="contained"
+                    sx={{
+                      mt: 1,
+                      py: 0.3,
+                      borderRadius: 2,
+                      bgcolor: '#1f6fa5',
+                      boxShadow: '0 0 0 1px rgba(80,160,220,0.25)',
+                      fontWeight: 500,
+                      fontSize: 20,
+                      textTransform: 'none',
+                      '&:hover': {
+                        bgcolor: '#2a86c7',
+                      },
+                    }}
+                  >
+                    Entrar
+                  </Button>
+                </Box>
+              </Box>
             </Box>
           </Grow>
         </Box>

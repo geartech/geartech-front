@@ -7,6 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import IconButton from '@mui/material/IconButton';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormPasswordProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
@@ -21,6 +22,7 @@ export function FormPassword<TFormValues extends FieldValues>({
   rules,
   ...textFieldProps
 }: FormPasswordProps<TFormValues>) {
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -30,6 +32,9 @@ export function FormPassword<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
+  const translatedLabel = typeof label === 'string' ? t(label) : label;
+  const translatedPlaceholder =
+    typeof textFieldProps.placeholder === 'string' ? t(textFieldProps.placeholder) : textFieldProps.placeholder;
 
   const handleToggleVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -49,7 +54,8 @@ export function FormPassword<TFormValues extends FieldValues>({
           {...field}
           size="small"
           type={showPassword ? 'text' : 'password'}
-          label={label}
+          label={translatedLabel}
+          placeholder={translatedPlaceholder}
           required={required}
           disabled={disabled}
           error={!!fieldError}

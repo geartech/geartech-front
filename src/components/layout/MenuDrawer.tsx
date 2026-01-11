@@ -32,7 +32,7 @@ interface MenuDrawerProps {
 
 export function MenuDrawer({ mobileOpen, handleDrawerToggle }: MenuDrawerProps) {
   const { user } = useAuth();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(true); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [openSubmenus, setOpenSubmenus] = useState<{ [key: string]: boolean }>({});
   const [search, setSearch] = useState('');
   const currentDrawerWidth = expanded ? drawerWidth : 40;
