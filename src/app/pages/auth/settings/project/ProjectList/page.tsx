@@ -47,6 +47,7 @@ export default function ProjectList() {
       if (!searchData) return;
 
       const response = await geartechApi.project.listProjects({
+        startDate: searchData.startDate,
         name: searchData.name || '',
         pageNum: searchData.pageNum || 1,
         pageSize: searchData.pageSize || 10,
@@ -75,16 +76,12 @@ export default function ProjectList() {
           {/* Form com inputs e buttons inline */}
           <Form<SearchProjectRequest>>
             <Form.DatePicker
-              name="name"
-              label="projectName"
+              name="startDate"
+              label="startDate"
             />
-            <Form.DateTimePicker
-              name="name"
-              label="projectName"
-            />
-            <Form.TimePicker
-              name="name"
-              label="projectName"
+            <Form.DatePicker
+              name="endDate"
+              label="startDate"
             />
             <Form.Input
               name="name"

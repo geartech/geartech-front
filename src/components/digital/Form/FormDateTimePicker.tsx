@@ -4,6 +4,7 @@ import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-
 import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
+import { PICKER_WIDTHS } from './utils';
 
 export type FormDateTimePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
   Omit<DateTimePickerProps, 'value' | 'onChange'> & {};
@@ -15,6 +16,7 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
   required,
   disabled,
   rules,
+  slotProps: customSlotProps,
   ...dateTimePickerProps
 }: FormDateTimePickerProps<TFormValues>) {
   const { t } = useTranslation();
@@ -35,38 +37,47 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
         required: required ? `${label || 'Campo'} é obrigatório` : false,
         ...rules,
       }}
-      render={({ field }) => (
-        <DateTimePicker
-          {...dateTimePickerProps}
-          label={translatedLabel}
-          ampm={false}
-          value={field.value ?? null}
-          onChange={(date) => field.onChange(date)}
-          disabled={disabled}
-          inputRef={field.ref}
-          slotProps={{
-            actionBar: {
-              actions: ['today', 'clear'],
-            },
-            textField: {
-              fullWidth: true,
-              required,
-              size: 'small',
-              error: !!fieldError,
-              helperText: errorMessage || helperText,
-              onBlur: field.onBlur,
-              variant: 'outlined',
-              sx: {
-                width: '100%',
-                '& .MuiOutlinedInput-root': {
-                  backgroundColor: 'inherit',
+      render={({ field }) => {
+        // Garante que value seja null ou um objeto Dayjs válido
+        const isValidValue =
+          field.value === null ||
+          field.value === undefined ||
+          (field.value && typeof field.value === 'object' && 'isValid' in field.value);
+        const safeValue = isValidValue ? field.value ?? null : null;
+
+        return (
+          <DateTimePicker
+            {...dateTimePickerProps}
+            label={translatedLabel}
+            ampm={false}
+            value={safeValue}
+            onChange={(date) => field.onChange(date)}
+            disabled={disabled}
+            inputRef={field.ref}
+            slotProps={{
+              actionBar: {
+                actions: ['today', 'clear'],
+              },
+              textField: {
+                required,
+                size: 'small',
+                error: !!fieldError,
+                helperText: errorMessage || helperText,
+                onBlur: field.onBlur,
+                variant: 'outlined',
+                sx: {
+                  width: PICKER_WIDTHS.datetime,
+                  maxWidth: '100%',
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'inherit',
+                  },
                 },
               },
-            },
-            ...dateTimePickerProps.slotProps,
-          }}
-        />
-      )}
+              ...customSlotProps,
+            }}
+          />
+        );
+      }}
     />
   );
 }

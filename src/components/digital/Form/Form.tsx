@@ -99,18 +99,21 @@ const FormWrapper = React.forwardRef(function FormWrapper<TFormValues extends Fi
   props: FormContainerProps<TFormValues>,
   ref: React.Ref<FormHandle<TFormValues>>
 ) {
+  const { sx, ...restProps } = props;
+
   return (
     <FormContainer
       sx={{
         display: 'grid',
         gridTemplateColumns: {
-          xs: '1fr',
-          sm: 'repeat(auto-fit, minmax(200px, 1fr))',
+          xs: '1fr', // mobile: empilhado
+          sm: 'repeat(auto-fit, minmax(auto, 1fr))', // tamanho real dos inputs + growth
         },
         gap: 1,
         alignItems: 'end',
+        ...sx, // permite override manual
       }}
-      {...props}
+      {...restProps}
       form={ref as React.RefObject<FormHandle<TFormValues>>}
     />
   );

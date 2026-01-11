@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
+import { widthFromMaxLength } from './utils';
 
 export interface SelectOption {
   value: string | number;
@@ -19,6 +20,7 @@ export type FormSelectProps<TFormValues extends FieldValues> = FormFieldBaseProp
   Omit<SelectProps, 'name' | 'error' | 'value' | 'onChange' | 'onBlur'> & {
     options: SelectOption[];
     placeholder?: string;
+    maxLength?: number;
   };
 
 export function FormSelect<TFormValues extends FieldValues>({
@@ -30,6 +32,8 @@ export function FormSelect<TFormValues extends FieldValues>({
   rules,
   options,
   placeholder,
+  maxLength,
+  sx,
   ...selectProps
 }: FormSelectProps<TFormValues>) {
   const { t } = useTranslation();
@@ -54,18 +58,20 @@ export function FormSelect<TFormValues extends FieldValues>({
       }}
       render={({ field }) => (
         <FormControl
-          fullWidth
           error={!!fieldError}
           disabled={disabled}
           required={required}
+          sx={{
+            width: widthFromMaxLength(maxLength),
+            maxWidth: '100%',
+            ...sx, // permite override manual
+          }}
         >
           {label && <InputLabel id={labelId}>{translatedLabel}</InputLabel>}
           <Select
             {...selectProps}
             {...field}
             size="small"
-            fullWidth
-            sx={{ width: '100%' }}
             labelId={labelId}
             label={translatedLabel}
             value={field.value ?? ''}
