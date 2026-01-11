@@ -19,7 +19,6 @@ export type FormSelectProps<TFormValues extends FieldValues> = FormFieldBaseProp
   Omit<SelectProps, 'name' | 'error' | 'value' | 'onChange' | 'onBlur'> & {
     options: SelectOption[];
     placeholder?: string;
-    fullWidth?: boolean;
   };
 
 export function FormSelect<TFormValues extends FieldValues>({
@@ -31,7 +30,6 @@ export function FormSelect<TFormValues extends FieldValues>({
   rules,
   options,
   placeholder,
-  fullWidth = true,
   ...selectProps
 }: FormSelectProps<TFormValues>) {
   const { t } = useTranslation();
@@ -56,7 +54,7 @@ export function FormSelect<TFormValues extends FieldValues>({
       }}
       render={({ field }) => (
         <FormControl
-          fullWidth={fullWidth}
+          fullWidth
           error={!!fieldError}
           disabled={disabled}
           required={required}
@@ -66,6 +64,8 @@ export function FormSelect<TFormValues extends FieldValues>({
             {...selectProps}
             {...field}
             size="small"
+            fullWidth
+            sx={{ width: '100%' }}
             labelId={labelId}
             label={translatedLabel}
             value={field.value ?? ''}

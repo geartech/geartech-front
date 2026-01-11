@@ -52,6 +52,9 @@ export function FormSwitch<TFormValues extends FieldValues>({
             control={
               <Switch
                 {...switchProps}
+                sx={{
+                  alignSelf: 'center',
+                }}
                 checked={!!field.value}
                 onChange={(e) => field.onChange(e.target.checked)}
                 onBlur={field.onBlur}

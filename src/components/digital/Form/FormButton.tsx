@@ -192,7 +192,7 @@ export function FormButton({
   const finalDisableOnSubmitting = disableOnSubmitting ?? config.disableOnSubmitting;
   const finalHtmlType = config.htmlType;
 
-  // Merge sx: config.sx + sx do usuário
+  // Merge sx: config.sx + sx do usuário + width
   const finalSx: SxProps<Theme> = [config.sx || {}, ...(Array.isArray(sx) ? sx : [sx])];
 
   const isLoading = loading || (finalDisableOnSubmitting && isSubmitting);

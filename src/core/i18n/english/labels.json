@@ -22,5 +22,6 @@
   "confirmMultipleDeleteMessage": "Are you sure you want to delete {count} selected record(s)?",
   "projectName": "Project Name",
   "typeToFilter": "Type to filter...",
-  "listProjects": "Project Listing"
+  "listProjects": "Project Listing",
+  "search": "Search"
 }

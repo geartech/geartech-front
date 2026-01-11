@@ -101,6 +101,15 @@ const FormWrapper = React.forwardRef(function FormWrapper<TFormValues extends Fi
 ) {
   return (
     <FormContainer
+      sx={{
+        display: 'grid',
+        gridTemplateColumns: {
+          xs: '1fr',
+          sm: 'repeat(auto-fit, minmax(200px, 1fr))',
+        },
+        gap: 1,
+        alignItems: 'end',
+      }}
       {...props}
       form={ref as React.RefObject<FormHandle<TFormValues>>}
     />

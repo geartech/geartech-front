@@ -22,5 +22,6 @@
   "confirmMultipleDeleteMessage": "Tem certeza que deseja excluir {count} registro(s) selecionado(s)?",
   "projectName": "Nome do Projeto",
   "typeToFilter": "Digite para filtrar...",
-  "listProjects": "Listagem de Projetos"
+  "listProjects": "Listagem de Projetos",
+  "search": "Pesquisar"
 }

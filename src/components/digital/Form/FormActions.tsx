@@ -5,27 +5,26 @@ import { ReactNode } from 'react';
 
 export interface FormActionsProps extends BoxProps {
   children: ReactNode;
-  align?: 'left' | 'center' | 'right' | 'space-between';
+  variant?: 'form' | 'search';
 }
 
-export function FormActions({
-  children,
-  align = 'right',
-  ...boxProps
-}: FormActionsProps) {
-  const justifyContent = {
-    left: 'flex-start',
-    center: 'center',
-    right: 'flex-end',
-    'space-between': 'space-between',
-  }[align];
-
+export function FormActions({ children, variant = 'form', ...boxProps }: FormActionsProps) {
   return (
     <Box
-      display="flex"
-      gap={2}
-      justifyContent={justifyContent}
-      mt={2}
+      sx={{
+        gridColumn: '1 / -1',
+        display: 'flex',
+        gap: 1,
+
+        justifyContent: {
+          xs: variant === 'search' ? 'flex-start' : 'stretch',
+          sm: 'flex-end',
+        },
+
+        '& > *': {
+          flex: variant === 'form' ? { xs: 1, sm: 'unset' } : 'unset',
+        },
+      }}
       {...boxProps}
     >
       {children}

@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormTimePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> & {
-  fullWidth?: boolean;
   slotProps?: Record<string, Record<string, unknown>>;
 };
 
@@ -17,7 +16,6 @@ export function FormTimePicker<TFormValues extends FieldValues>({
   required,
   disabled,
   rules,
-  fullWidth = true,
   slotProps: customSlotProps,
   ...timePickerProps
 }: FormTimePickerProps<TFormValues>) {
@@ -52,7 +50,7 @@ export function FormTimePicker<TFormValues extends FieldValues>({
               actions: ['today', 'clear'],
             },
             textField: {
-              fullWidth,
+              fullWidth: true,
               required,
               size: 'small',
               error: !!fieldError,
@@ -60,6 +58,7 @@ export function FormTimePicker<TFormValues extends FieldValues>({
               onBlur: field.onBlur,
               variant: 'outlined',
               sx: {
+                width: '100%',
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: 'inherit',
                 },

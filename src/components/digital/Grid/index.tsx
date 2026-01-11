@@ -200,7 +200,7 @@ export default function Grid<T extends MRT_RowData>({
         muiPaginationProps={{ shape: 'rounded' }}
         muiTableContainerProps={{
           sx: {
-            height: height || 'calc(100vh - 290px)', // ocupa todo o espaço disponível
+            height: height || 'calc(100vh - 360px)', // ocupa todo o espaço disponível
           },
         }}
         muiTablePaperProps={{

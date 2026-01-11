@@ -6,9 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormDateTimePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
-  Omit<DateTimePickerProps, 'value' | 'onChange'> & {
-    fullWidth?: boolean;
-  };
+  Omit<DateTimePickerProps, 'value' | 'onChange'> & {};
 
 export function FormDateTimePicker<TFormValues extends FieldValues>({
   name,
@@ -17,7 +15,6 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
   required,
   disabled,
   rules,
-  fullWidth = true,
   ...dateTimePickerProps
 }: FormDateTimePickerProps<TFormValues>) {
   const { t } = useTranslation();
@@ -52,7 +49,7 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
               actions: ['today', 'clear'],
             },
             textField: {
-              fullWidth,
+              fullWidth: true,
               required,
               size: 'small',
               error: !!fieldError,
@@ -60,6 +57,7 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
               onBlur: field.onBlur,
               variant: 'outlined',
               sx: {
+                width: '100%',
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: 'inherit',
                 },

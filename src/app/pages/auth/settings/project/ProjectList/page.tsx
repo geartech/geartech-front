@@ -60,19 +60,6 @@ export default function ProjectList() {
     }
   };
 
-  /* Handler para limpar formulário */
-  const handleClear = () => {
-    console.log('Formulário resetado');
-    setGridData(null);
-  };
-
-  /* Handler para deletar com dados do form */
-  const handleDelete = async (data: unknown) => {
-    const searchData = data as SearchProjectRequest;
-    console.log('Deletar projetos com filtro:', searchData);
-    // Aqui você teria a lógica de deletar múltiplos projetos baseado no filtro
-  };
-
   return (
     <View>
       <Header title="Projetos" />
@@ -87,31 +74,33 @@ export default function ProjectList() {
         >
           {/* Form com inputs e buttons inline */}
           <Form<SearchProjectRequest>>
+            <Form.DatePicker
+              name="name"
+              label="projectName"
+            />
+            <Form.DateTimePicker
+              name="name"
+              label="projectName"
+            />
+            <Form.TimePicker
+              name="name"
+              label="projectName"
+            />
             <Form.Input
               name="name"
               label="projectName"
               placeholder="typeToFilter"
-              maxLength={5}
+              maxLength={150}
+              loading={false}
             />
-            <Form.Button
-              buttonType="info"
-              onClick={handleSearch}
-            >
-              Buscar
-            </Form.Button>
-            <Form.Button
-              buttonType="reset"
-              onClick={handleClear}
-            >
-              Limpar
-            </Form.Button>
-            <Form.Button
-              buttonType="delete"
-              onClick={handleDelete}
-              confirmMessage="Deseja realmente deletar os projetos filtrados?"
-            >
-              Deletar Filtrados
-            </Form.Button>
+            <Form.Actions variant="search">
+              <Form.Button
+                buttonType="info"
+                onClick={handleSearch}
+              >
+                {t('search')}
+              </Form.Button>
+            </Form.Actions>
           </Form>
         </Card>
         {/* Grid com dados da busca */}
