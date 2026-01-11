@@ -6,7 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 
 export type FormInputProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
-  Omit<TextFieldProps, 'name' | 'error' | 'helperText' | 'value' | 'onChange' | 'onBlur'>;
+  Omit<TextFieldProps, 'name' | 'error' | 'helperText' | 'value' | 'onChange' | 'onBlur'> & {
+    maxLength?: number;
+  };
 
 export function FormInput<TFormValues extends FieldValues>({
   name,
@@ -15,6 +17,7 @@ export function FormInput<TFormValues extends FieldValues>({
   required,
   disabled,
   rules,
+  maxLength,
   ...textFieldProps
 }: FormInputProps<TFormValues>) {
   const { t } = useTranslation();
@@ -50,6 +53,7 @@ export function FormInput<TFormValues extends FieldValues>({
           helperText={errorMessage || helperText}
           fullWidth
           value={field.value ?? ''}
+          inputProps={{ maxLength, ...textFieldProps.inputProps }}
         />
       )}
     />

@@ -91,6 +91,7 @@ export default function ProjectList() {
               name="name"
               label="projectName"
               placeholder="typeToFilter"
+              maxLength={5}
             />
             <Form.Button
               buttonType="info"
