@@ -4,7 +4,7 @@
   "tabWidth": 2,
   "singleQuote": true,
   "bracketSameLine": false,
-  "singleAttributePerLine": true,
+  "singleAttributePerLine": false,
   "bracketSpacing": true,
   "proseWrap": "preserve",
   "trailingComma": "es5"

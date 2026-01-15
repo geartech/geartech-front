@@ -1,6 +1,7 @@
 'use client';
 
-import View from '@/components/digital/View';
+import { useRouter } from 'next/navigation';
+import View, { Filter } from '@/components/digital/View';
 import Grid, { GridColumnDef } from '@/components/digital/Grid';
 import {
   geartechApi,
@@ -11,9 +12,8 @@ import {
   SearchProjectRequest,
 } from '@/core/sdk';
 import { useState, useRef } from 'react';
-import { Form } from '@/components/digital/Form/FormGeneric';
+import { Form } from '@/components/digital/Form';
 import { FormHandle } from '@/components/digital/Form/Form';
-import { Card } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/digital/Button';
 
@@ -25,14 +25,14 @@ const getColumns = (): GridColumnDef<ProjectDTO>[] => [
   {
     accessorKey: 'type',
     header: 'type',
-    columnType: 'enum' as const,
+    columnType: 'enum',
     enumType: ProjectDtoTypeEnum,
     i18nPrefix: 'enum.projectType',
   },
   {
     accessorKey: 'status',
     header: 'status',
-    columnType: 'enum' as const,
+    columnType: 'enum',
     enumType: ProjectDtoStatusEnum,
     i18nPrefix: 'enum.projectStatus',
   },
@@ -42,12 +42,12 @@ export default function ProjectList() {
   const [gridData, setGridData] = useState<PageInfoProjectDTO | null>(null);
   const { t } = useTranslation();
   const formRef = useRef<FormHandle<SearchProjectRequest>>(null);
+  const router = useRouter();
 
   /* Handler para busca de projetos com dados do formulário */
   const handleSearch = async () => {
     try {
       // Validar formulário e mostrar erros
-
       const isValid = await formRef.current?.handleSubmit(async (values) => {
         const response = await geartechApi.project.listProjects({
           startDate: values?.startDate,
@@ -70,42 +70,32 @@ export default function ProjectList() {
     }
   };
 
+  const handleNewProject = () => {
+    router.push('/pages/auth/workspace/project/ProjectForm');
+  };
+
   return (
     <View>
       <Header
-        title={
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
-            <span>Projetos</span>
-            <Button
-              buttonType="info"
-              onClick={handleSearch}
-            >
+        title="Projetos"
+        buttons={
+          <>
+            <Button buttonType="button" onClick={handleNewProject}>
+              {t('newProject')}
+            </Button>
+            <Button buttonType="info" onClick={handleSearch}>
               {t('search')}
             </Button>
-          </div>
+          </>
         }
       />
 
       <Body>
-        <Card
-          sx={{
-            borderRadius: 3,
-            boxShadow: 1,
-            p: 1,
-            mb: 2,
-          }}
-        >
+        <Filter>
           {/* Form tipado com genéricos inline */}
           <Form<SearchProjectRequest> ref={formRef}>
-            <Form.DatePicker
-              name="startDate"
-              label="startDate"
-              required
-            />
-            <Form.DateTimePicker
-              name="endDate"
-              label="endDate"
-            />
+            <Form.DatePicker name="startDate" label="startDate" required />
+            <Form.DateTimePicker name="endDate" label="endDate" />
             <Form.Input
               name="name"
               label="projectName"
@@ -115,7 +105,7 @@ export default function ProjectList() {
               required
             />
           </Form>
-        </Card>
+        </Filter>
         {/* Grid com dados da busca */}
         <Grid
           title={t('listProjects')}

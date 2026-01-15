@@ -25,22 +25,22 @@ export const menuItems: MenuItemProps[] = [
     children: [
       {
         text: 'Projetos',
-        href: '/pages/auth/settings/project/ProjectList',
+        href: '/pages/auth/workspace/project/ProjectList',
         permission: ['ADM', 'PROJECT_ACCESS'],
       },
       {
         text: 'Ordens De Serviço',
-        href: '/pages/auth/settings/serviceOrder/ServiceOrderList',
+        href: '/pages/auth/workspace/serviceOrder/ServiceOrderList',
         permission: ['ADM', 'PROJECT_ACCESS'],
       },
       {
         text: 'Sprints',
-        href: '/pages/auth/settings/sprint/SprintList',
+        href: '/pages/auth/workspace/sprint/SprintList',
         permission: ['ADM', 'PROJECT_ACCESS'],
       },
       {
         text: 'Tarefas',
-        href: '/pages/auth/settings/task/TaskList',
+        href: '/pages/auth/workspace/task/TaskList',
         permission: ['ADM', 'PROJECT_ACCESS'],
       },
     ],
@@ -62,7 +62,7 @@ export const menuItems: MenuItemProps[] = [
     icon: <SmartToy sx={{ fontSize: 20 }} />,
     permission: ['ADM', 'SETTINGS_ACCESS'],
     children: [
-      { text: 'Projects', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Projects', href: '/pages/auth/workspace/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
     ],
   },
   {
@@ -70,12 +70,12 @@ export const menuItems: MenuItemProps[] = [
     icon: <Settings sx={{ fontSize: 20 }} />,
     permission: ['ADM', 'SETTINGS_ACCESS'],
     children: [
-      { text: 'Regras', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
-      { text: 'Integrações', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
-      { text: 'Usuários', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Regras', href: '/pages/auth/workspace/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Integrações', href: '/pages/auth/workspace/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Usuários', href: '/pages/auth/workspace/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
       {
         text: 'Templates / Fluxos',
-        href: '/pages/auth/settings/project/ProjectList',
+        href: '/pages/auth/workspace/project/ProjectList',
         permission: ['ADM', 'PROJECT_ACCESS'],
       },
     ],

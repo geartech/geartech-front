@@ -7,7 +7,7 @@ type ViewRootProps = React.PropsWithChildren<{
   isDrawer?: boolean;
 }>;
 
-type ViewHeaderProps = { title: string | React.ReactNode };
+type ViewHeaderProps = { title: string | React.ReactNode; buttons?: React.ReactNode };
 type ViewBodyProps = { children: React.ReactNode };
 type ViewFooterProps = { children: React.ReactNode };
 
@@ -37,7 +37,7 @@ const View: ViewComponent = ({ children, isDrawer = false }: ViewRootProps) => {
   );
 };
 
-View.Header = function ViewHeader({ title }: { title: string | React.ReactNode }) {
+View.Header = function ViewHeader({ title, buttons }: ViewHeaderProps) {
   return (
     <Paper
       elevation={0}
@@ -46,15 +46,16 @@ View.Header = function ViewHeader({ title }: { title: string | React.ReactNode }
         width: '100%',
         p: 1,
         mb: 0,
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        gap: 2,
       }}
     >
-      <Typography
-        variant="h5"
-        component="h1"
-        fontWeight={700}
-      >
+      <Typography variant="h5" component="h1" fontWeight={700}>
         {title}
       </Typography>
+      {buttons && <Box sx={{ display: 'flex', gap: 1 }}>{buttons}</Box>}
     </Paper>
   );
 };

@@ -74,14 +74,7 @@ function FormContainerComponent<TFormValues extends FieldValues>(
 
   return (
     <FormProvider {...methods}>
-      <Box
-        component="form"
-        id={id}
-        className={className}
-        onSubmit={handleFormSubmit}
-        noValidate
-        {...boxProps}
-      >
+      <Box component="form" id={id} className={className} onSubmit={handleFormSubmit} noValidate {...boxProps}>
         {children}
       </Box>
     </FormProvider>
@@ -100,6 +93,7 @@ const FormWrapper = React.forwardRef(function FormWrapper<TFormValues extends Fi
 
   return (
     <FormContainer
+      ref={ref}
       sx={{
         display: 'flex',
         flexWrap: 'wrap',
@@ -109,7 +103,6 @@ const FormWrapper = React.forwardRef(function FormWrapper<TFormValues extends Fi
         ...sx,
       }}
       {...restProps}
-      form={ref as React.RefObject<FormHandle<TFormValues>>}
     />
   );
 }) as <T extends FieldValues = FieldValues>(props: FormContainerProps<T>) => React.ReactElement;
