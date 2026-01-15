@@ -328,6 +328,19 @@ export default function ThemeCustom(mode: PaletteMode = 'light', options: ThemeO
       },
 
       // =============================
+      // FORM HELPER TEXT
+      // =============================
+      MuiFormHelperText: {
+        styleOverrides: {
+          root: {
+            '&.Mui-error': {
+              color: isDark ? '#F87171' : buttonColors.delete.main, // vermelho mais claro no dark
+            },
+          },
+        },
+      },
+
+      // =============================
       // CHIPS
       // =============================
       MuiChip: {

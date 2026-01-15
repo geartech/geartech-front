@@ -4,7 +4,6 @@ import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
-import { PICKER_WIDTHS } from './utils';
 
 export type FormTimePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> & {
   slotProps?: Record<string, Record<string, unknown>>;
@@ -35,7 +34,7 @@ export function FormTimePicker<TFormValues extends FieldValues>({
       name={name}
       control={control}
       rules={{
-        required: required ? `${label || 'Campo'} é obrigatório` : false,
+        required: required ? `${translatedLabel || 'Campo'} é obrigatório` : false,
         ...rules,
       }}
       render={({ field }) => {
@@ -49,12 +48,19 @@ export function FormTimePicker<TFormValues extends FieldValues>({
         return (
           <TimePicker
             {...timePickerProps}
+            ampm={false}
+            views={['hours', 'minutes']}
+            closeOnSelect={true}
+            onAccept={(time) => field.onChange(time)}
             label={translatedLabel}
             value={safeValue}
             onChange={(time) => field.onChange(time)}
             disabled={disabled}
             inputRef={field.ref}
             slotProps={{
+              toolbar: {
+                hidden: true,
+              },
               actionBar: {
                 actions: ['today', 'clear'],
               },
@@ -62,12 +68,15 @@ export function FormTimePicker<TFormValues extends FieldValues>({
                 required,
                 size: 'small',
                 error: !!fieldError,
-                helperText: errorMessage || helperText,
+                helperText: errorMessage || helperText || ' ',
                 onBlur: field.onBlur,
                 variant: 'outlined',
+                FormHelperTextProps: {
+                  sx: { minHeight: '1.25em' }, // ← altura fixa
+                },
                 sx: {
-                  width: PICKER_WIDTHS.time,
-                  maxWidth: '100%',
+                  minWidth: '12ch',
+                  width: '14ch',
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'inherit',
                   },

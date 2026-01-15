@@ -8,7 +8,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
-import { widthFromMaxLength } from './utils';
 
 export interface SelectOption {
   value: string | number;
@@ -48,12 +47,37 @@ export function FormSelect<TFormValues extends FieldValues>({
   const translatedLabel = typeof label === 'string' ? t(label) : label;
   const translatedPlaceholder = typeof placeholder === 'string' ? t(placeholder) : placeholder;
 
+  // ✅ Calcula width inteligente baseado em maxLength OU nas opções
+  const calculateWidth = () => {
+    // Se maxLength fornecido, usa mesma lógica do Input
+    if (maxLength) {
+      const MIN_CH = 8;
+      const MAX_CH = 40;
+      const ch = Math.min(Math.max(maxLength * 0.8, MIN_CH), MAX_CH);
+      return `${ch}ch`;
+    }
+
+    // Se não tem maxLength, calcula baseado na maior label das opções
+    if (options.length > 0) {
+      const maxLabelLength = Math.max(...options.map((opt) => opt.label.length));
+      const MIN_CH = 12; // Select precisa espaço mínimo maior (label + ícone dropdown)
+      const MAX_CH = 40;
+      const ch = Math.min(Math.max(maxLabelLength * 0.8, MIN_CH), MAX_CH);
+      return `${ch}ch`;
+    }
+
+    // Fallback: width natural do componente
+    return undefined;
+  };
+
+  const autoWidth = calculateWidth();
+
   return (
     <Controller
       name={name}
       control={control}
       rules={{
-        required: required ? `${label || 'Campo'} é obrigatório` : false,
+        required: required ? `${translatedLabel || 'Campo'} é obrigatório` : false,
         ...rules,
       }}
       render={({ field }) => (
@@ -62,8 +86,8 @@ export function FormSelect<TFormValues extends FieldValues>({
           disabled={disabled}
           required={required}
           sx={{
-            width: widthFromMaxLength(maxLength),
-            maxWidth: '100%',
+            minWidth: '12ch', // Select precisa espaço mínimo (label + dropdown icon)
+            width: autoWidth || '100%', // width específico ou flex
             ...sx, // permite override manual
           }}
         >
@@ -95,7 +119,9 @@ export function FormSelect<TFormValues extends FieldValues>({
               </MenuItem>
             ))}
           </Select>
-          {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
+          {(errorMessage || helperText || ' ') && (
+            <FormHelperText sx={{ minHeight: '1.25em' }}>{errorMessage || helperText}</FormHelperText>
+          )}
         </FormControl>
       )}
     />

@@ -1,6 +1,7 @@
 import { useRef } from 'react';
-import { UseFormReturn, FieldValues } from 'react-hook-form';
+import { FieldValues } from 'react-hook-form';
+import { FormHandle } from '@/components/digital/Form/Form';
 
 export function useFormRef<T extends FieldValues>() {
-  return useRef<UseFormReturn<T>>(null);
+  return useRef<FormHandle<T>>(null);
 }

@@ -10,10 +10,12 @@ import {
   ProjectDTO,
   SearchProjectRequest,
 } from '@/core/sdk';
-import { useState } from 'react';
-import { Form } from '@/components/digital/Form';
+import { useState, useRef } from 'react';
+import { Form } from '@/components/digital/Form/FormGeneric';
+import { FormHandle } from '@/components/digital/Form/Form';
 import { Card } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/digital/Button';
 
 const { Header, Body } = View;
 
@@ -39,22 +41,29 @@ const getColumns = (): GridColumnDef<ProjectDTO>[] => [
 export default function ProjectList() {
   const [gridData, setGridData] = useState<PageInfoProjectDTO | null>(null);
   const { t } = useTranslation();
+  const formRef = useRef<FormHandle<SearchProjectRequest>>(null);
 
   /* Handler para busca de projetos com dados do formulário */
-  const handleSearch = async (data: unknown) => {
+  const handleSearch = async () => {
     try {
-      const searchData = data as SearchProjectRequest;
-      if (!searchData) return;
+      // Validar formulário e mostrar erros
 
-      const response = await geartechApi.project.listProjects({
-        startDate: searchData.startDate,
-        name: searchData.name || '',
-        pageNum: searchData.pageNum || 1,
-        pageSize: searchData.pageSize || 10,
-      });
+      const isValid = await formRef.current?.handleSubmit(async (values) => {
+        const response = await geartechApi.project.listProjects({
+          startDate: values?.startDate,
+          name: values?.name || '',
+          pageNum: values?.pageNum || 1,
+          pageSize: values?.pageSize || 10,
+        });
 
-      if (response.data) {
-        setGridData(response.data);
+        if (response.data) {
+          setGridData(response.data);
+        }
+      })();
+
+      // Se handleSubmit retornar undefined, é porque há erros
+      if (isValid === undefined) {
+        console.log('Formulário contém erros. Verifique os campos.');
       }
     } catch (error) {
       console.error('Erro ao carregar projetos:', error);
@@ -63,7 +72,20 @@ export default function ProjectList() {
 
   return (
     <View>
-      <Header title="Projetos" />
+      <Header
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px' }}>
+            <span>Projetos</span>
+            <Button
+              buttonType="info"
+              onClick={handleSearch}
+            >
+              {t('search')}
+            </Button>
+          </div>
+        }
+      />
+
       <Body>
         <Card
           sx={{
@@ -73,15 +95,16 @@ export default function ProjectList() {
             mb: 2,
           }}
         >
-          {/* Form com inputs e buttons inline */}
-          <Form<SearchProjectRequest>>
+          {/* Form tipado com genéricos inline */}
+          <Form<SearchProjectRequest> ref={formRef}>
             <Form.DatePicker
               name="startDate"
               label="startDate"
+              required
             />
-            <Form.DatePicker
+            <Form.DateTimePicker
               name="endDate"
-              label="startDate"
+              label="endDate"
             />
             <Form.Input
               name="name"
@@ -89,15 +112,8 @@ export default function ProjectList() {
               placeholder="typeToFilter"
               maxLength={150}
               loading={false}
+              required
             />
-            <Form.Actions variant="search">
-              <Form.Button
-                buttonType="info"
-                onClick={handleSearch}
-              >
-                {t('search')}
-              </Form.Button>
-            </Form.Actions>
           </Form>
         </Card>
         {/* Grid com dados da busca */}

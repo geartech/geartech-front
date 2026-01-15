@@ -1,13 +1,13 @@
 'use client';
 
 import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-form';
-import { DateTimePicker, DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
+
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
-import { PICKER_WIDTHS } from './utils';
+import { DesktopDateTimePicker, DesktopDateTimePickerProps } from '@mui/x-date-pickers';
 
 export type FormDateTimePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
-  Omit<DateTimePickerProps, 'value' | 'onChange'> & {};
+  Omit<DesktopDateTimePickerProps, 'value' | 'onChange'> & {};
 
 export function FormDateTimePicker<TFormValues extends FieldValues>({
   name,
@@ -34,7 +34,7 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
       name={name}
       control={control}
       rules={{
-        required: required ? `${label || 'Campo'} é obrigatório` : false,
+        required: required ? `${translatedLabel || 'Campo'} é obrigatório` : false,
         ...rules,
       }}
       render={({ field }) => {
@@ -46,15 +46,20 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
         const safeValue = isValidValue ? field.value ?? null : null;
 
         return (
-          <DateTimePicker
+          <DesktopDateTimePicker
             {...dateTimePickerProps}
             label={translatedLabel}
             ampm={false}
             value={safeValue}
+            closeOnSelect={true}
+            onAccept={(date) => field.onChange(date)}
             onChange={(date) => field.onChange(date)}
             disabled={disabled}
             inputRef={field.ref}
             slotProps={{
+              toolbar: {
+                hidden: true, // ← Remove o toolbar "SELECIONE A DATA"
+              },
               actionBar: {
                 actions: ['today', 'clear'],
               },
@@ -62,12 +67,15 @@ export function FormDateTimePicker<TFormValues extends FieldValues>({
                 required,
                 size: 'small',
                 error: !!fieldError,
-                helperText: errorMessage || helperText,
+                helperText: errorMessage || helperText || ' ',
                 onBlur: field.onBlur,
                 variant: 'outlined',
+                FormHelperTextProps: {
+                  sx: { minHeight: '1.25em' }, // ← altura fixa
+                },
                 sx: {
-                  width: PICKER_WIDTHS.datetime,
-                  maxWidth: '100%',
+                  minWidth: '20ch',
+                  width: '26ch',
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'inherit',
                   },

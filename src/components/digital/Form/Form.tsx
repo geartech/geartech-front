@@ -50,7 +50,6 @@ function FormContainerComponent<TFormValues extends FieldValues>(
     resolver,
   });
 
-  // Expor métodos via ref usando useImperativeHandle
   React.useImperativeHandle(ref, () => ({
     getValues: methods.getValues,
     handleSubmit: methods.handleSubmit,
@@ -59,7 +58,6 @@ function FormContainerComponent<TFormValues extends FieldValues>(
     watch: methods.watch,
   }));
 
-  // Expor métodos via form prop também
   React.useEffect(() => {
     if (form?.current) {
       Object.assign(form.current, {
@@ -94,7 +92,6 @@ export const FormContainer = React.forwardRef(FormContainerComponent) as <T exte
   props: FormContainerProps<T> & { form?: React.RefObject<FormHandle<T>> }
 ) => React.ReactElement;
 
-// Wrapper genérico para manter type arguments
 const FormWrapper = React.forwardRef(function FormWrapper<TFormValues extends FieldValues = FieldValues>(
   props: FormContainerProps<TFormValues>,
   ref: React.Ref<FormHandle<TFormValues>>
@@ -104,14 +101,12 @@ const FormWrapper = React.forwardRef(function FormWrapper<TFormValues extends Fi
   return (
     <FormContainer
       sx={{
-        display: 'grid',
-        gridTemplateColumns: {
-          xs: '1fr', // mobile: empilhado
-          sm: 'repeat(auto-fit, minmax(auto, 1fr))', // tamanho real dos inputs + growth
-        },
+        display: 'flex',
+        flexWrap: 'wrap',
         gap: 1,
-        alignItems: 'end',
-        ...sx, // permite override manual
+        alignItems: 'flex-end',
+        justifyContent: 'start',
+        ...sx,
       }}
       {...restProps}
       form={ref as React.RefObject<FormHandle<TFormValues>>}

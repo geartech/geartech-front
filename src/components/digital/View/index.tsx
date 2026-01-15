@@ -122,6 +122,8 @@ View.Body = function ViewBody({ children }: ViewBodyProps) {
           minHeight: 0,
           overflowY: 'auto',
           p: { xs: 1, sm: 1.5 },
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         {children}
@@ -144,4 +146,5 @@ View.Footer = function ViewFooter({ children }: { children: React.ReactNode }) {
   );
 };
 
+export { Filter } from './Filter';
 export default View;

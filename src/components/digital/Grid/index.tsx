@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MaterialReactTable, MRT_ColumnDef, MRT_RowData } from 'material-react-table';
 import localization from './localization';
@@ -55,6 +55,9 @@ export default function Grid<T extends MRT_RowData>({
   const [confirmMultipleOpen, setConfirmMultipleOpen] = useState(false);
   const [idsToDelete, setIdsToDelete] = useState<(string | number)[]>([]);
   const [deletingMultiple, setDeletingMultiple] = useState(false);
+
+  // Auto-height: o grid ocupa 100% da altura do container (View.Body cuida do overflow)
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleConfirmDelete = async () => {
     if (!rowToDelete || !onDelete) {
@@ -190,77 +193,97 @@ export default function Grid<T extends MRT_RowData>({
 
   return (
     <>
-      <MaterialReactTable
-        enableStickyHeader
-        columns={colsWithActions}
-        data={data}
-        localization={localization}
-        paginationDisplayMode="pages"
-        enableDensityToggle={false} // remove botão de alternância
-        muiPaginationProps={{ shape: 'rounded' }}
-        muiTableContainerProps={{
-          sx: {
-            height: height || 'calc(100vh - 360px)', // ocupa todo o espaço disponível
-          },
+      <div
+        ref={containerRef}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
+          minHeight: 0,
+          width: '100%',
         }}
-        muiTablePaperProps={{
-          sx: {
-            borderRadius: 3, // bordas arredondadas
-            boxShadow: 2,
-          },
-        }}
-        initialState={{
-          density: 'compact', // densidade fixa
-        }}
-        // título
-        renderTopToolbarCustomActions={() =>
-          title ? <span style={{ fontSize: 20, fontWeight: 600, marginLeft: 2 }}>{title}</span> : null
-        }
-        // checkboxes aparecem quando ligado
-        enableRowSelection={selectMode}
-        enableMultiRowSelection
-        onRowSelectionChange={setRowSelection}
-        state={{ rowSelection }}
-        // sem banner
-        renderToolbarAlertBannerContent={() => null}
-        muiToolbarAlertBannerProps={{ sx: { display: 'none' } }}
-        // footer: contagem + botões do caller
-        renderBottomToolbarCustomActions={({ table }) => {
-          const selected = table.getSelectedRowModel().flatRows.map((r) => r.original as T);
-          const content =
-            typeof footerActions === 'function'
-              ? footerActions({ selected, selectMode, toggleSelectMode })
-              : footerActions;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          const ids = selected.map((s: any) => s.id);
-          const temSelecao = ids.length > 0;
+      >
+        <MaterialReactTable
+          enableStickyHeader
+          columns={colsWithActions}
+          data={data}
+          localization={localization}
+          paginationDisplayMode="pages"
+          enableDensityToggle={false} // remove botão de alternância
+          muiPaginationProps={{ shape: 'rounded' }}
+          muiTableContainerProps={{
+            sx: {
+              height: height || '100%',
+              flex: height ? undefined : 1,
+              minHeight: 0,
+              display: 'flex',
+              flexDirection: 'column',
+            },
+          }}
+          muiTablePaperProps={{
+            sx: {
+              borderRadius: 3,
+              boxShadow: 2,
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+            },
+          }}
+          initialState={{
+            density: 'compact', // densidade fixa
+          }}
+          // título
+          renderTopToolbarCustomActions={() =>
+            title ? <span style={{ fontSize: 20, fontWeight: 600, marginLeft: 2 }}>{title}</span> : null
+          }
+          // checkboxes aparecem quando ligado
+          enableRowSelection={selectMode}
+          enableMultiRowSelection
+          onRowSelectionChange={setRowSelection}
+          state={{ rowSelection }}
+          // sem banner
+          renderToolbarAlertBannerContent={() => null}
+          muiToolbarAlertBannerProps={{ sx: { display: 'none' } }}
+          // footer: contagem + botões do caller
+          renderBottomToolbarCustomActions={({ table }) => {
+            const selected = table.getSelectedRowModel().flatRows.map((r) => r.original as T);
+            const content =
+              typeof footerActions === 'function'
+                ? footerActions({ selected, selectMode, toggleSelectMode })
+                : footerActions;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const ids = selected.map((s: any) => s.id);
+            const temSelecao = ids.length > 0;
 
-          return (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              {content || null}
-              {onMultipleDelete && (
-                <Button
-                  buttonType="delete"
-                  color={selectMode ? 'error' : 'inherit'}
-                  onClick={() => {
-                    if (!selectMode) {
-                      toggleSelectMode();
-                    } else if (temSelecao) {
-                      setIdsToDelete(ids);
-                      setConfirmMultipleOpen(true);
-                    }
-                  }}
-                  disabled={selectMode && !temSelecao}
-                  sx={{ ml: 1 }}
-                >
-                  {selectMode ? t('deleteAll') : t('multipleDelete')}
-                </Button>
-              )}
-              {selectMode && <span style={{ fontSize: 12, opacity: 0.8 }}>{selected.length} selecionado(s)</span>}
-            </div>
-          );
-        }}
-      />
+            return (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                {content || null}
+                {onMultipleDelete && (
+                  <Button
+                    buttonType="delete"
+                    color={selectMode ? 'error' : 'inherit'}
+                    onClick={() => {
+                      if (!selectMode) {
+                        toggleSelectMode();
+                      } else if (temSelecao) {
+                        setIdsToDelete(ids);
+                        setConfirmMultipleOpen(true);
+                      }
+                    }}
+                    disabled={selectMode && !temSelecao}
+                    sx={{ ml: 1 }}
+                  >
+                    {selectMode ? t('deleteAll') : t('multipleDelete')}
+                  </Button>
+                )}
+                {selectMode && <span style={{ fontSize: 12, opacity: 0.8 }}>{selected.length} selecionado(s)</span>}
+              </div>
+            );
+          }}
+        />
+      </div>
+
+      {/* Dialogs permanecem fora da div containerRef */}
 
       <Dialog
         open={confirmOpen}

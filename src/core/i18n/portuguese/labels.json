@@ -23,5 +23,7 @@
   "projectName": "Nome do Projeto",
   "typeToFilter": "Digite para filtrar...",
   "listProjects": "Listagem de Projetos",
-  "search": "Pesquisar"
+  "search": "Pesquisar",
+  "startDate": "Data de Início",
+  "endDate": "Data Fim"
 }

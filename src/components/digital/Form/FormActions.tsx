@@ -17,7 +17,10 @@ export function FormActions({ children, variant = 'form', align, sx, ...boxProps
   return (
     <Box
       sx={{
-        gridColumn: '1 / -1',
+        // ✅ FLEXBOX: ocupa 100% da linha
+        width: '100%',
+        flexBasis: '100%', // força quebra de linha no flex container pai
+
         display: 'flex',
         gap: 1,
 

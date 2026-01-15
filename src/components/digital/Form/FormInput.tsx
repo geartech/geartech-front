@@ -5,7 +5,6 @@ import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 import { Skeleton } from '@mui/material';
-import { widthFromMaxLength } from './utils';
 
 export type FormInputProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
   Omit<TextFieldProps, 'name' | 'error' | 'helperText' | 'value' | 'onChange' | 'onBlur'> & {
@@ -33,10 +32,19 @@ export function FormInput<TFormValues extends FieldValues>({
 
   const fieldError = errors[name] as FieldError | undefined;
   const errorMessage = getErrorMessage(fieldError, label);
-
   const translatedLabel = typeof label === 'string' ? t(label) : label;
   const translatedPlaceholder =
     typeof textFieldProps.placeholder === 'string' ? t(textFieldProps.placeholder) : textFieldProps.placeholder;
+
+  const calculateWidth = () => {
+    if (!maxLength) return undefined;
+    const MIN_CH = 8;
+    const MAX_CH = 40;
+    const ch = Math.min(Math.max(maxLength * 0.8, MIN_CH), MAX_CH);
+    return `${ch}ch`;
+  };
+
+  const autoWidth = calculateWidth();
 
   if (loading) {
     return (
@@ -44,8 +52,8 @@ export function FormInput<TFormValues extends FieldValues>({
         variant="rounded"
         height={40}
         sx={{
-          width: widthFromMaxLength(maxLength),
-          maxWidth: '100%',
+          minWidth: '12ch',
+          width: autoWidth || '100%',
         }}
       />
     );
@@ -56,7 +64,7 @@ export function FormInput<TFormValues extends FieldValues>({
       name={name}
       control={control}
       rules={{
-        required: required ? `${label || 'Campo'} é obrigatório` : false,
+        required: required ? `${translatedLabel || 'Campo'} é obrigatório` : false,
         ...rules,
       }}
       render={({ field }) => (
@@ -69,16 +77,19 @@ export function FormInput<TFormValues extends FieldValues>({
           required={required}
           disabled={disabled}
           error={!!fieldError}
-          helperText={errorMessage || helperText}
+          helperText={errorMessage || helperText || ' '}
+          FormHelperTextProps={{
+            sx: { minHeight: '1.25em' },
+          }}
           value={field.value ?? ''}
           inputProps={{
             maxLength,
             ...textFieldProps.inputProps,
           }}
           sx={{
-            width: widthFromMaxLength(maxLength),
-            maxWidth: '100%',
-            ...sx, // permite override manual
+            minWidth: '12ch',
+            width: autoWidth || '100%',
+            ...sx,
           }}
         />
       )}

@@ -47,7 +47,7 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
       name={name}
       control={control}
       rules={{
-        required: required ? `${label || 'Campo'} é obrigatório` : false,
+        required: required ? `${translatedLabel || 'Campo'} é obrigatório` : false,
         ...rules,
       }}
       render={({ field }) => (
