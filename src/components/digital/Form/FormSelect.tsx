@@ -8,6 +8,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
+import { Grid } from '@mui/material';
 
 export interface SelectOption {
   value: string | number;
@@ -19,7 +20,8 @@ export type FormSelectProps<TFormValues extends FieldValues> = FormFieldBaseProp
   Omit<SelectProps, 'name' | 'error' | 'value' | 'onChange' | 'onBlur'> & {
     options: SelectOption[];
     placeholder?: string;
-    maxLength?: number;
+    baseSize?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+    compact?: boolean;
   };
 
 export function FormSelect<TFormValues extends FieldValues>({
@@ -31,7 +33,8 @@ export function FormSelect<TFormValues extends FieldValues>({
   rules,
   options,
   placeholder,
-  maxLength,
+  baseSize = 3,
+  compact = false,
   sx,
   ...selectProps
 }: FormSelectProps<TFormValues>) {
@@ -47,26 +50,23 @@ export function FormSelect<TFormValues extends FieldValues>({
   const translatedLabel = typeof label === 'string' ? t(label) : label;
   const translatedPlaceholder = typeof placeholder === 'string' ? t(placeholder) : placeholder;
 
-  // ✅ Calcula width inteligente baseado em maxLength OU nas opções
-  const calculateWidth = () => {
-    // Se maxLength fornecido, usa mesma lógica do Input
-    if (maxLength) {
-      const MIN_CH = 8;
-      const MAX_CH = 40;
-      const ch = Math.min(Math.max(maxLength * 0.8, MIN_CH), MAX_CH);
-      return `${ch}ch`;
-    }
+  function toResponsiveSize(base: number) {
+    return {
+      xs: 12,
+      sm: Math.min(12, base * 2),
+      md: Math.min(12, Math.ceil(base * 1.5)),
+      lg: base,
+    };
+  }
 
-    // Se não tem maxLength, calcula baseado na maior label das opções
+  const calculateWidth = () => {
     if (options.length > 0) {
       const maxLabelLength = Math.max(...options.map((opt) => opt.label.length));
-      const MIN_CH = 12; // Select precisa espaço mínimo maior (label + ícone dropdown)
+      const MIN_CH = 12;
       const MAX_CH = 40;
       const ch = Math.min(Math.max(maxLabelLength * 0.8, MIN_CH), MAX_CH);
       return `${ch}ch`;
     }
-
-    // Fallback: width natural do componente
     return undefined;
   };
 
@@ -81,48 +81,57 @@ export function FormSelect<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <FormControl
-          error={!!fieldError}
-          disabled={disabled}
-          required={required}
-          sx={{
-            minWidth: '12ch', // Select precisa espaço mínimo (label + dropdown icon)
-            width: autoWidth || '100%', // width específico ou flex
-            ...sx, // permite override manual
-          }}
-        >
-          {label && <InputLabel id={labelId}>{translatedLabel}</InputLabel>}
-          <Select
-            {...selectProps}
-            {...field}
-            size="small"
-            labelId={labelId}
-            label={translatedLabel}
-            value={field.value ?? ''}
-            displayEmpty={!!translatedPlaceholder}
+        <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
+          <FormControl
+            error={!!fieldError}
+            disabled={disabled}
+            required={required}
+            size="small" // ✅ CRÍTICO: size no FormControl
+            sx={{
+              minWidth: compact ? '180px' : '12ch',
+              width: compact ? '180px' : autoWidth || '100%',
+              ...sx,
+            }}
           >
-            {translatedPlaceholder && (
-              <MenuItem
-                value=""
-                disabled
+            {label && (
+              <InputLabel
+                id={labelId}
+                size="small" // ✅ Label também precisa do size
               >
-                <em>{translatedPlaceholder}</em>
-              </MenuItem>
+                {translatedLabel}
+              </InputLabel>
             )}
-            {options.map((option) => (
-              <MenuItem
-                key={option.value}
-                value={option.value}
-                disabled={option.disabled}
-              >
-                {option.label}
-              </MenuItem>
-            ))}
-          </Select>
-          {(errorMessage || helperText || ' ') && (
-            <FormHelperText sx={{ minHeight: '1.25em' }}>{errorMessage || helperText}</FormHelperText>
-          )}
-        </FormControl>
+            <Select
+              {...selectProps}
+              {...field}
+              size="small"
+              labelId={labelId}
+              label={translatedLabel}
+              value={field.value ?? ''}
+              displayEmpty={!!translatedPlaceholder}
+              renderValue={(selected) => {
+                // ✅ Fix placeholder: mostra placeholder quando vazio
+                if (!selected || selected === '') {
+                  return <em style={{ color: 'rgba(128, 128, 128, 0.7)' }}>{translatedPlaceholder}</em>;
+                }
+                const option = options.find((opt) => opt.value === selected);
+                return option?.label || String(selected);
+              }}
+            >
+              {translatedPlaceholder && (
+                <MenuItem value="" disabled>
+                  <em>{translatedPlaceholder}</em>
+                </MenuItem>
+              )}
+              {options.map((option) => (
+                <MenuItem key={option.value} value={option.value} disabled={option.disabled}>
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+            <FormHelperText sx={{ minHeight: '1.25em' }}>{errorMessage || helperText || ' '}</FormHelperText>
+          </FormControl>
+        </Grid>
       )}
     />
   );

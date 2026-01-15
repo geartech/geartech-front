@@ -4,12 +4,14 @@ import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
-import { Skeleton } from '@mui/material';
+import { Grid, Skeleton } from '@mui/material';
 
 export type FormInputProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
   Omit<TextFieldProps, 'name' | 'error' | 'helperText' | 'value' | 'onChange' | 'onBlur'> & {
     maxLength?: number;
     loading?: boolean;
+    baseSize?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+    compact?: boolean;
   };
 
 export function FormInput<TFormValues extends FieldValues>({
@@ -21,6 +23,8 @@ export function FormInput<TFormValues extends FieldValues>({
   rules,
   maxLength,
   loading,
+  baseSize = 3,
+  compact = false,
   sx,
   ...textFieldProps
 }: FormInputProps<TFormValues>) {
@@ -36,26 +40,27 @@ export function FormInput<TFormValues extends FieldValues>({
   const translatedPlaceholder =
     typeof textFieldProps.placeholder === 'string' ? t(textFieldProps.placeholder) : textFieldProps.placeholder;
 
-  const calculateWidth = () => {
-    if (!maxLength) return undefined;
-    const MIN_CH = 8;
-    const MAX_CH = 40;
-    const ch = Math.min(Math.max(maxLength * 0.8, MIN_CH), MAX_CH);
-    return `${ch}ch`;
-  };
-
-  const autoWidth = calculateWidth();
+  function toResponsiveSize(base: number) {
+    return {
+      xs: 12,
+      sm: Math.min(12, base * 2),
+      md: Math.min(12, Math.ceil(base * 1.5)),
+      lg: base,
+    };
+  }
 
   if (loading) {
     return (
-      <Skeleton
-        variant="rounded"
-        height={40}
-        sx={{
-          minWidth: '12ch',
-          width: autoWidth || '100%',
-        }}
-      />
+      <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
+        <Skeleton
+          variant="rounded"
+          height={40}
+          sx={{
+            minWidth: compact ? '180px' : '12ch',
+            width: compact ? '180px' : '100%',
+          }}
+        />
+      </Grid>
     );
   }
 
@@ -68,30 +73,35 @@ export function FormInput<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <TextField
-          {...textFieldProps}
-          {...field}
-          size="small"
-          label={translatedLabel}
-          placeholder={translatedPlaceholder}
-          required={required}
-          disabled={disabled}
-          error={!!fieldError}
-          helperText={errorMessage || helperText || ' '}
-          FormHelperTextProps={{
-            sx: { minHeight: '1.25em' },
-          }}
-          value={field.value ?? ''}
-          inputProps={{
-            maxLength,
-            ...textFieldProps.inputProps,
-          }}
-          sx={{
-            minWidth: '12ch',
-            width: autoWidth || '100%',
-            ...sx,
-          }}
-        />
+        <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
+          <TextField
+            {...textFieldProps}
+            {...field}
+            size="small"
+            label={translatedLabel}
+            placeholder={translatedPlaceholder}
+            required={required}
+            disabled={disabled}
+            error={!!fieldError}
+            helperText={errorMessage || helperText || ' '}
+            FormHelperTextProps={{
+              sx: { minHeight: '1.25em' },
+            }}
+            value={field.value ?? ''}
+            inputProps={{
+              maxLength,
+              ...textFieldProps.inputProps,
+            }}
+            sx={{
+              minWidth: compact ? '180px' : '12ch',
+              width: compact ? '180px' : '100%',
+              '& .MuiOutlinedInput-root': {
+                backgroundColor: 'inherit',
+              },
+              ...sx,
+            }}
+          />
+        </Grid>
       )}
     />
   );

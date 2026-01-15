@@ -5,6 +5,7 @@
  */
 
 import { Form } from '@/components/digital/Form';
+import { Grid } from '@mui/material';
 import { Dayjs } from 'dayjs';
 
 // Interface correta para formulário com campos de data
@@ -21,14 +22,9 @@ interface SearchFiltersDTO {
  */
 export function IncorrectExample() {
   return (
-    <Form<{ name: string }>
-      onSubmit={(data) => console.log(data)}
-    >
+    <Form<{ name: string }> onSubmit={(data) => console.log(data)}>
       {/* ❌ ERRADO: FormDatePicker com campo string */}
-      <Form.DatePicker
-        name="name"
-        label="Nome do Projeto"
-      />
+      <Form.DatePicker name="name" label="Nome do Projeto" />
     </Form>
   );
 }
@@ -46,36 +42,29 @@ export function CorrectExample() {
   return (
     <Form<SearchFiltersDTO> onSubmit={handleSearch}>
       {/* ✅ CORRETO: FormInput para strings */}
-      <Form.Input
-        name="projectName"
-        label="Nome do Projeto"
-        placeholder="Digite o nome..."
-        maxLength={150}
-      />
+      <Grid size={6}>
+        <Form.Input name="projectName" label="Nome do Projeto" placeholder="Digite o nome..." maxLength={150} />
+      </Grid>
 
       {/* ✅ CORRETO: FormDatePicker para datas */}
-      <Form.DatePicker
-        name="startDate"
-        label="Data de Início"
-      />
+      <Grid size={3}>
+        <Form.DatePicker name="startDate" label="Data de Início" />
+      </Grid>
 
       {/* ✅ CORRETO: FormDatePicker para datas */}
-      <Form.DatePicker
-        name="endDate"
-        label="Data de Término"
-      />
+      <Grid size={3}>
+        <Form.DatePicker name="endDate" label="Data de Término" />
+      </Grid>
 
       {/* ✅ CORRETO: FormTimePicker para horários */}
-      <Form.TimePicker
-        name="startTime"
-        label="Horário de Início"
-      />
+      <Grid size={6}>
+        <Form.TimePicker name="startTime" label="Horário de Início" />
+      </Grid>
 
       {/* ✅ CORRETO: FormDateTimePicker para data + hora */}
-      <Form.DateTimePicker
-        name="createdAt"
-        label="Data de Criação"
-      />
+      <Grid size={6}>
+        <Form.DateTimePicker name="createdAt" label="Data de Criação" />
+      </Grid>
 
       <Form.Actions variant="search">
         <Form.Button buttonType="info">Buscar</Form.Button>

@@ -12,6 +12,7 @@ export { FormDatePicker, type FormDatePickerProps } from './FormDatePicker';
 export { FormDateTimePicker, type FormDateTimePickerProps } from './FormDateTimePicker';
 export { FormTimePicker, type FormTimePickerProps } from './FormTimePicker';
 export { FormActions, type FormActionsProps } from './FormActions';
+export { FormSection, type FormSectionProps } from './FormSection';
 
 // Button unificado
 export { FormButton, type FormButtonProps, type FormButtonType, type FormButtonColor } from './FormButton';

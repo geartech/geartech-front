@@ -259,24 +259,30 @@ export default function Grid<T extends MRT_RowData>({
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 {content || null}
                 {onMultipleDelete && (
-                  <Button
-                    buttonType="delete"
-                    color={selectMode ? 'error' : 'inherit'}
-                    onClick={() => {
-                      if (!selectMode) {
-                        toggleSelectMode();
-                      } else if (temSelecao) {
-                        setIdsToDelete(ids);
-                        setConfirmMultipleOpen(true);
-                      }
-                    }}
-                    disabled={selectMode && !temSelecao}
-                    sx={{ ml: 1 }}
-                  >
-                    {selectMode ? t('deleteAll') : t('multipleDelete')}
-                  </Button>
+                  <>
+                    {selectMode && (
+                      <Button buttonType="cancel" onClick={toggleSelectMode} sx={{ ml: 1 }}>
+                        {t('cancel')}
+                      </Button>
+                    )}
+                    <Button
+                      buttonType="delete"
+                      onClick={() => {
+                        if (!selectMode) {
+                          toggleSelectMode();
+                        } else if (temSelecao) {
+                          setIdsToDelete(ids);
+                          setConfirmMultipleOpen(true);
+                        }
+                      }}
+                      disabled={selectMode && !temSelecao}
+                      sx={{ ml: 1 }}
+                    >
+                      {selectMode ? t('deleteAll') : t('multipleDelete')}
+                    </Button>
+                  </>
                 )}
-                {selectMode && <span style={{ fontSize: 12, opacity: 0.8 }}>{selected.length} selecionado(s)</span>}
+                {selectMode && <span style={{ fontSize: 14, opacity: 0.8 }}>{selected.length} selecionado(s)</span>}
               </div>
             );
           }}
@@ -309,18 +315,10 @@ export default function Grid<T extends MRT_RowData>({
         <DialogTitle>{t('confirmDelete')}</DialogTitle>
         <DialogContent>{t('confirmDeleteMessage')}</DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setConfirmOpen(false)}
-            buttonType="back"
-            disabled={deleting}
-          >
+          <Button onClick={() => setConfirmOpen(false)} buttonType="back" disabled={deleting}>
             Cancelar
           </Button>
-          <Button
-            onClick={handleConfirmDelete}
-            buttonType="delete"
-            disabled={deleting}
-          >
+          <Button onClick={handleConfirmDelete} buttonType="delete" disabled={deleting}>
             {deleting ? t('deleting') : t('delete')}
           </Button>
         </DialogActions>
@@ -350,18 +348,10 @@ export default function Grid<T extends MRT_RowData>({
         <DialogTitle>{t('confirmMultipleDelete')}</DialogTitle>
         <DialogContent>{t('confirmMultipleDeleteMessage', { count: idsToDelete.length })}</DialogContent>
         <DialogActions>
-          <Button
-            onClick={() => setConfirmMultipleOpen(false)}
-            buttonType="back"
-            disabled={deletingMultiple}
-          >
+          <Button onClick={() => setConfirmMultipleOpen(false)} buttonType="back" disabled={deletingMultiple}>
             {t('cancel')}
           </Button>
-          <Button
-            onClick={handleConfirmMultipleDelete}
-            buttonType="delete"
-            disabled={deletingMultiple}
-          >
+          <Button onClick={handleConfirmMultipleDelete} buttonType="delete" disabled={deletingMultiple}>
             {deletingMultiple ? t('deleting') : t('deleteAll')}
           </Button>
         </DialogActions>

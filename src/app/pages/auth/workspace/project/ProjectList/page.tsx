@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import View, { Filter } from '@/components/digital/View';
+import View from '@/components/digital/View';
 import Grid, { GridColumnDef } from '@/components/digital/Grid';
 import {
   geartechApi,
@@ -11,11 +11,11 @@ import {
   ProjectDTO,
   SearchProjectRequest,
 } from '@/core/sdk';
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Form } from '@/components/digital/Form';
-import { FormHandle } from '@/components/digital/Form/Form';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/digital/Button';
+import { useFormRef } from '@/app/utils/useFormRef';
 
 const { Header, Body } = View;
 
@@ -41,7 +41,7 @@ const getColumns = (): GridColumnDef<ProjectDTO>[] => [
 export default function ProjectList() {
   const [gridData, setGridData] = useState<PageInfoProjectDTO | null>(null);
   const { t } = useTranslation();
-  const formRef = useRef<FormHandle<SearchProjectRequest>>(null);
+  const formRef = useFormRef<SearchProjectRequest>();
   const router = useRouter();
 
   /* Handler para busca de projetos com dados do formulário */
@@ -51,6 +51,7 @@ export default function ProjectList() {
       const isValid = await formRef.current?.handleSubmit(async (values) => {
         const response = await geartechApi.project.listProjects({
           startDate: values?.startDate,
+          endDate: values?.endDate,
           name: values?.name || '',
           pageNum: values?.pageNum || 1,
           pageSize: values?.pageSize || 10,
@@ -91,21 +92,22 @@ export default function ProjectList() {
       />
 
       <Body>
-        <Filter>
-          {/* Form tipado com genéricos inline */}
-          <Form<SearchProjectRequest> ref={formRef}>
-            <Form.DatePicker name="startDate" label="startDate" required />
-            <Form.DateTimePicker name="endDate" label="endDate" />
-            <Form.Input
-              name="name"
-              label="projectName"
-              placeholder="typeToFilter"
-              maxLength={150}
-              loading={false}
-              required
-            />
-          </Form>
-        </Filter>
+        {/* Form tipado com genéricos inline */}
+
+        <Form<SearchProjectRequest> ref={formRef}>
+          <Form.DatePicker name="startDate" label="startDate" required />
+          <Form.DatePicker name="endDate" label="endDate" />
+
+          <Form.Input
+            name="name"
+            label="projectName"
+            placeholder="typeToFilter"
+            maxLength={150}
+            loading={false}
+            required
+          />
+        </Form>
+
         {/* Grid com dados da busca */}
         <Grid
           title={t('listProjects')}

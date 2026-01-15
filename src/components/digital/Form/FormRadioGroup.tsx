@@ -9,6 +9,7 @@ import Radio from '@mui/material/Radio';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
+import { Grid } from '@mui/material';
 
 export interface RadioOption {
   value: string | number;
@@ -19,6 +20,8 @@ export interface RadioOption {
 export type FormRadioGroupProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
   Omit<RadioGroupProps, 'name' | 'value' | 'onChange' | 'onBlur'> & {
     options: RadioOption[];
+    baseSize?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+    compact?: boolean;
   };
 
 export function FormRadioGroup<TFormValues extends FieldValues>({
@@ -29,6 +32,8 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
   disabled,
   rules,
   options,
+  baseSize = 3,
+  compact = false,
   row,
   ...radioGroupProps
 }: FormRadioGroupProps<TFormValues>) {
@@ -42,6 +47,15 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
   const errorMessage = getErrorMessage(fieldError, label);
   const translatedLabel = typeof label === 'string' ? t(label) : label;
 
+  function toResponsiveSize(base: number) {
+    return {
+      xs: 12,
+      sm: Math.min(12, base * 2),
+      md: Math.min(12, Math.ceil(base * 1.5)),
+      lg: base,
+    };
+  }
+
   return (
     <Controller
       name={name}
@@ -51,30 +65,31 @@ export function FormRadioGroup<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <FormControl
-          error={!!fieldError}
-          disabled={disabled}
-          required={required}
-        >
-          {label && <FormLabel>{translatedLabel}</FormLabel>}
-          <RadioGroup
-            {...radioGroupProps}
-            {...field}
-            row={row}
-            value={field.value ?? ''}
+        <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
+          <FormControl
+            error={!!fieldError}
+            disabled={disabled}
+            required={required}
+            sx={{
+              minWidth: compact ? '180px' : 'auto',
+              width: compact ? '180px' : '100%',
+            }}
           >
-            {options.map((option) => (
-              <FormControlLabel
-                key={option.value}
-                value={option.value}
-                control={<Radio />}
-                label={option.label}
-                disabled={option.disabled}
-              />
-            ))}
-          </RadioGroup>
-          {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
-        </FormControl>
+            {label && <FormLabel>{translatedLabel}</FormLabel>}
+            <RadioGroup {...radioGroupProps} {...field} row={row} value={field.value ?? ''}>
+              {options.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio />}
+                  label={option.label}
+                  disabled={option.disabled}
+                />
+              ))}
+            </RadioGroup>
+            {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
+          </FormControl>
+        </Grid>
       )}
     />
   );

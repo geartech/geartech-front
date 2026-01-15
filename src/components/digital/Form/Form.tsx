@@ -2,6 +2,7 @@
 
 import { useForm, FormProvider, FieldValues, UseFormReturn } from 'react-hook-form';
 import Box, { BoxProps } from '@mui/material/Box';
+import { Grid, Paper } from '@mui/material';
 import React from 'react';
 import { FormProps } from './types';
 import { FormInput } from './FormInput';
@@ -15,6 +16,7 @@ import { FormDateTimePicker } from './FormDateTimePicker';
 import { FormTimePicker } from './FormTimePicker';
 import { FormButton } from './FormButton';
 import { FormActions } from './FormActions';
+import { FormSection } from './FormSection';
 
 export interface FormHandle<TFormValues extends FieldValues> {
   getValues: UseFormReturn<TFormValues>['getValues'];
@@ -28,6 +30,7 @@ interface FormContainerProps<TFormValues extends FieldValues>
   extends FormProps<TFormValues>,
     Omit<BoxProps, 'onSubmit' | 'children'> {
   form?: React.RefObject<FormHandle<TFormValues>>;
+  alignItems?: 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline';
 }
 
 function FormContainerComponent<TFormValues extends FieldValues>(
@@ -40,6 +43,7 @@ function FormContainerComponent<TFormValues extends FieldValues>(
     id,
     className,
     form,
+    alignItems = 'stretch',
     ...boxProps
   }: FormContainerProps<TFormValues>,
   ref: React.Ref<FormHandle<TFormValues>>
@@ -74,9 +78,13 @@ function FormContainerComponent<TFormValues extends FieldValues>(
 
   return (
     <FormProvider {...methods}>
-      <Box component="form" id={id} className={className} onSubmit={handleFormSubmit} noValidate {...boxProps}>
-        {children}
-      </Box>
+      <Paper variant="outlined" elevation={1} sx={{ p: 1, pt: 1.5, mb: 1, borderRadius: 2 }}>
+        <Box component="form" id={id} className={className} onSubmit={handleFormSubmit} noValidate {...boxProps}>
+          <Grid container rowSpacing={3} columnSpacing={2} alignItems={alignItems} wrap="wrap">
+            {children}
+          </Grid>
+        </Box>
+      </Paper>
     </FormProvider>
   );
 }
@@ -89,22 +97,9 @@ const FormWrapper = React.forwardRef(function FormWrapper<TFormValues extends Fi
   props: FormContainerProps<TFormValues>,
   ref: React.Ref<FormHandle<TFormValues>>
 ) {
-  const { sx, ...restProps } = props;
+  const { ...restProps } = props;
 
-  return (
-    <FormContainer
-      ref={ref}
-      sx={{
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: 1,
-        alignItems: 'flex-end',
-        justifyContent: 'start',
-        ...sx,
-      }}
-      {...restProps}
-    />
-  );
+  return <FormContainer ref={ref} {...restProps} />;
 }) as <T extends FieldValues = FieldValues>(props: FormContainerProps<T>) => React.ReactElement;
 
 // Compound Component Pattern
@@ -120,4 +115,5 @@ export const Form = Object.assign(FormWrapper, {
   TimePicker: FormTimePicker,
   Button: FormButton,
   Actions: FormActions,
+  Section: FormSection,
 });

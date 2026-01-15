@@ -4,9 +4,13 @@ import { Controller, useFormContext, FieldValues, FieldError } from 'react-hook-
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers';
+import { Grid } from '@mui/material';
 
 export type FormDatePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
-  Omit<DesktopDatePickerProps, 'value' | 'onChange'> & {};
+  Omit<DesktopDatePickerProps, 'value' | 'onChange'> & {
+    baseSize?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+    compact?: boolean;
+  };
 
 export function FormDatePicker<TFormValues extends FieldValues>({
   name,
@@ -15,6 +19,8 @@ export function FormDatePicker<TFormValues extends FieldValues>({
   required,
   disabled,
   rules,
+  baseSize = 3,
+  compact = false,
   slotProps: customSlotProps,
   ...datePickerProps
 }: FormDatePickerProps<TFormValues>) {
@@ -28,6 +34,15 @@ export function FormDatePicker<TFormValues extends FieldValues>({
   const errorMessage = getErrorMessage(fieldError, label);
   const translatedLabel = typeof label === 'string' ? t(label) : label;
 
+  function toResponsiveSize(base: number) {
+    return {
+      xs: 12,
+      sm: Math.min(12, base * 2),
+      md: Math.min(12, Math.ceil(base * 1.5)),
+      lg: base,
+    };
+  }
+
   return (
     <Controller
       name={name}
@@ -37,51 +52,44 @@ export function FormDatePicker<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => {
-        // Garante que value seja null ou um objeto Dayjs válido
-        const isValidValue =
-          field.value === null ||
-          field.value === undefined ||
-          (field.value && typeof field.value === 'object' && 'isValid' in field.value);
-        const safeValue = isValidValue ? field.value ?? null : null;
+        const safeValue = field.value && typeof field.value === 'object' ? field.value : field.value ?? null;
 
         return (
-          <DesktopDatePicker
-            {...datePickerProps}
-            label={translatedLabel}
-            value={safeValue}
-            closeOnSelect={true}
-            onAccept={(date) => field.onChange(date)}
-            onChange={(date) => field.onChange(date)}
-            disabled={disabled}
-            inputRef={field.ref}
-            slotProps={{
-              toolbar: {
-                hidden: true, // ← Remove o toolbar "SELECIONE A DATA"
-              },
-              actionBar: {
-                actions: ['today', 'clear'],
-              },
-              textField: {
-                required,
-                size: 'small',
-                error: !!fieldError,
-                helperText: errorMessage || helperText || ' ',
-                onBlur: field.onBlur,
-                variant: 'outlined',
-                FormHelperTextProps: {
-                  sx: { minHeight: '1.25em' }, // ← altura fixa
-                },
-                sx: {
-                  minWidth: '20h',
-                  width: '22ch',
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'inherit',
+          <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
+            <DesktopDatePicker
+              {...datePickerProps}
+              label={translatedLabel}
+              value={safeValue}
+              closeOnSelect
+              onChange={(date) => field.onChange(date)}
+              onAccept={(date) => field.onChange(date)}
+              disabled={disabled}
+              inputRef={field.ref}
+              slotProps={{
+                toolbar: { hidden: true },
+                actionBar: { actions: ['today', 'clear'] },
+                textField: {
+                  required,
+                  size: 'small',
+                  error: !!fieldError,
+                  helperText: errorMessage || helperText || ' ',
+                  onBlur: field.onBlur,
+                  variant: 'outlined',
+                  FormHelperTextProps: {
+                    sx: { minHeight: '1.25em' },
+                  },
+                  sx: {
+                    width: compact ? '180px' : '22ch',
+                    minWidth: compact ? '180px' : '22ch',
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'inherit',
+                    },
                   },
                 },
-              },
-              ...customSlotProps,
-            }}
-          />
+                ...customSlotProps,
+              }}
+            />
+          </Grid>
         );
       }}
     />

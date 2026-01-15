@@ -1,21 +1,18 @@
 'use client';
 
 import { Button } from '@/components/digital/Button';
-import { FormHandle } from '@/components/digital/Form/Form';
 import { Form } from '@/components/digital/Form';
-import View, { Filter } from '@/components/digital/View';
+import View from '@/components/digital/View';
 import { ProjectRequest } from '@/core/sdk';
-import { Grid } from '@mui/material';
 import { useRouter } from 'next/navigation';
-
-import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useFormRef } from '@/app/utils/useFormRef';
 
 const { Header, Body } = View;
 
 export default function ProjectForm() {
   const { t } = useTranslation();
-  const formRef = useRef<FormHandle<ProjectRequest>>(null);
+  const formRef = useFormRef<ProjectRequest>();
   const router = useRouter();
 
   const handleSaveProject = async () => {
@@ -43,28 +40,30 @@ export default function ProjectForm() {
       />
 
       <Body>
-        <Filter>
-          <Form<ProjectRequest> ref={formRef}>
-            <Grid container spacing={1}>
-              <Grid size={3}>
-                <Form.DatePicker name="startDate" label="startDate" required />
-              </Grid>
-              <Grid size={3}>
-                <Form.DateTimePicker name="endDate" label="endDate" />
-              </Grid>
-              <Grid size={6}>
-                <Form.Input
-                  name="name"
-                  label="projectName"
-                  placeholder="typeToFilter"
-                  maxLength={150}
-                  loading={false}
-                  required
-                />
-              </Grid>
-            </Grid>
-          </Form>
-        </Filter>
+        <Form<ProjectRequest> ref={formRef}>
+          <Form.Section title="Projeto" baseSize={8}>
+            <Form.Input name="name" label="Nome do projeto" baseSize={12} required />
+          </Form.Section>
+
+          <Form.Section title="Vigência" layout="inline" baseSize={12}>
+            <Form.TimePicker name="startDate" required compact />
+            <Form.DatePicker name="endDate" label="Data de término" compact />
+            <Form.DateTimePicker name="finishDateTime" label="Data e hora de término" compact />
+
+            <Form.Select
+              options={[
+                { value: 'A', label: 'Option A' },
+                { value: 'B', label: 'Option B' },
+                { value: 'C', label: 'Option C' },
+              ]}
+              name="priority"
+              label="Prioridade"
+              baseSize={6}
+            />
+            <Form.Switch name="isActive" label="Projeto ativo" baseSize={4} />
+            <Form.Checkbox name="isPublic" label="Projeto público" baseSize={4} />
+          </Form.Section>
+        </Form>
       </Body>
     </View>
   );

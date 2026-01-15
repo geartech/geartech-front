@@ -28,7 +28,7 @@ const View: ViewComponent = ({ children, isDrawer = false }: ViewRootProps) => {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        p: isDrawer ? 0 : { xs: 1, sm: 1.5 },
+        p: isDrawer ? 0 : { xs: 0.5, sm: 1 },
         gap: 1,
       }}
     >
@@ -62,28 +62,30 @@ View.Header = function ViewHeader({ title, buttons }: ViewHeaderProps) {
 
 View.Body = function ViewBody({ children }: ViewBodyProps) {
   const ref = React.useRef<HTMLDivElement>(null);
+  const [atStart, setAtStart] = React.useState(true);
   const [atEnd, setAtEnd] = React.useState(true);
 
-  const updateShadow = React.useCallback(() => {
+  const updateShadows = React.useCallback(() => {
     const el = ref.current;
     if (!el) return;
+    setAtStart(el.scrollTop <= 1);
     setAtEnd(el.scrollTop + el.clientHeight >= el.scrollHeight - 1);
   }, []);
 
   React.useLayoutEffect(() => {
-    updateShadow();
+    updateShadows();
     const el = ref.current;
     if (!el) return;
-    const ro = new ResizeObserver(updateShadow);
+    const ro = new ResizeObserver(updateShadows);
     ro.observe(el);
-    el.addEventListener('scroll', updateShadow);
-    window.addEventListener('resize', updateShadow);
+    el.addEventListener('scroll', updateShadows);
+    window.addEventListener('resize', updateShadows);
     return () => {
       ro.disconnect();
-      el.removeEventListener('scroll', updateShadow);
-      window.removeEventListener('resize', updateShadow);
+      el.removeEventListener('scroll', updateShadows);
+      window.removeEventListener('resize', updateShadows);
     };
-  }, [updateShadow]);
+  }, [updateShadows]);
 
   return (
     <Paper
@@ -95,7 +97,27 @@ View.Body = function ViewBody({ children }: ViewBodyProps) {
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'hidden', // <- evita que o ::after role junto
+        overflow: 'hidden',
+        // Sombra no TOP
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          left: 0,
+          right: 0,
+          top: 0,
+          height: 24,
+          borderTopLeftRadius: 'inherit',
+          borderTopRightRadius: 'inherit',
+          pointerEvents: 'none',
+          zIndex: 1,
+          opacity: atStart ? 0 : 1,
+          transition: 'opacity .2s',
+          background:
+            theme.palette.mode === 'dark'
+              ? 'linear-gradient(to top, rgba(0,0,0,0), rgba(0,0,0,.35))'
+              : 'linear-gradient(to top, rgba(0,0,0,0), rgba(0,0,0,.18))',
+        },
+        // Sombra no BOTTOM
         '&::after': {
           content: '""',
           position: 'absolute',
@@ -106,6 +128,7 @@ View.Body = function ViewBody({ children }: ViewBodyProps) {
           borderBottomLeftRadius: 'inherit',
           borderBottomRightRadius: 'inherit',
           pointerEvents: 'none',
+          zIndex: 1,
           opacity: atEnd ? 0 : 1,
           transition: 'opacity .2s',
           background:
@@ -115,14 +138,14 @@ View.Body = function ViewBody({ children }: ViewBodyProps) {
         },
       })}
     >
-      {/* Aqui é quem rola */}
       <Box
         ref={ref}
         sx={{
           flex: 1,
           minHeight: 0,
           overflowY: 'auto',
-          p: { xs: 1, sm: 1.5 },
+          p: { xs: 0.2, sm: 0.5 },
+          pb: { xs: 0.5, sm: 1 },
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -147,5 +170,4 @@ View.Footer = function ViewFooter({ children }: { children: React.ReactNode }) {
   );
 };
 
-export { Filter } from './Filter';
 export default View;

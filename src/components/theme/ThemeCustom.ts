@@ -211,14 +211,6 @@ export default function ThemeCustom(mode: PaletteMode = 'light', options: ThemeO
         },
       },
 
-      MuiTextField: {
-        styleOverrides: {
-          root: {
-            backgroundColor: inputBg,
-          },
-        },
-      },
-
       // =============================
       // BUTTONS - PALETA UX CORPORATIVA
       // =============================
@@ -335,6 +327,9 @@ export default function ThemeCustom(mode: PaletteMode = 'light', options: ThemeO
           root: {
             '&.Mui-error': {
               color: isDark ? '#F87171' : buttonColors.delete.main, // vermelho mais claro no dark
+              '&.Mui-required': {
+                color: textSec, // ou 'inherit'
+              },
             },
           },
         },

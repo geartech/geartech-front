@@ -7,9 +7,13 @@ import Checkbox, { CheckboxProps } from '@mui/material/Checkbox';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
+import { Box, Grid } from '@mui/material';
 
 export type FormCheckboxProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
-  Omit<CheckboxProps, 'name' | 'checked' | 'onChange' | 'onBlur'>;
+  Omit<CheckboxProps, 'name' | 'checked' | 'onChange' | 'onBlur'> & {
+    baseSize?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+    compact?: boolean;
+  };
 
 export function FormCheckbox<TFormValues extends FieldValues>({
   name,
@@ -18,6 +22,8 @@ export function FormCheckbox<TFormValues extends FieldValues>({
   required,
   disabled,
   rules,
+  baseSize = 3,
+  compact = false,
   ...checkboxProps
 }: FormCheckboxProps<TFormValues>) {
   const { t } = useTranslation();
@@ -30,6 +36,15 @@ export function FormCheckbox<TFormValues extends FieldValues>({
   const errorMessage = getErrorMessage(fieldError, label);
   const translatedLabel = typeof label === 'string' ? t(label) : label;
 
+  function toResponsiveSize(base: number) {
+    return {
+      xs: 12,
+      sm: Math.min(12, base * 2),
+      md: Math.min(12, Math.ceil(base * 1.5)),
+      lg: base,
+    };
+  }
+
   return (
     <Controller
       name={name}
@@ -39,24 +54,47 @@ export function FormCheckbox<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => (
-        <FormControl
-          error={!!fieldError}
-          disabled={disabled}
-        >
-          <FormControlLabel
-            control={
-              <Checkbox
-                {...checkboxProps}
-                checked={!!field.value}
-                onChange={(e) => field.onChange(e.target.checked)}
-                onBlur={field.onBlur}
-                inputRef={field.ref}
+        <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
+          <FormControl
+            error={!!fieldError}
+            disabled={disabled}
+            sx={{
+              minWidth: compact ? '180px' : 'auto',
+              width: compact ? '180px' : '100%',
+            }}
+          >
+            {/* ✅ Box wrapper para alinhar verticalmente com inputs size="small" */}
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 40, // ✅ Mesma altura do TextField size="small"
+              }}
+            >
+              <FormControlLabel
+                sx={{
+                  margin: 0,
+                  '& .MuiFormControlLabel-label': {
+                    fontSize: '0.875rem',
+                  },
+                }}
+                control={
+                  <Checkbox
+                    {...checkboxProps}
+                    size="small" // ✅ Checkbox menor para melhor proporção
+                    checked={!!field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    onBlur={field.onBlur}
+                    inputRef={field.ref}
+                  />
+                }
+                label={translatedLabel || ''}
               />
-            }
-            label={translatedLabel || ''}
-          />
-          {(errorMessage || helperText) && <FormHelperText>{errorMessage || helperText}</FormHelperText>}
-        </FormControl>
+            </Box>
+            {/* ✅ HelperText sempre presente para manter altura consistente */}
+            <FormHelperText sx={{ minHeight: '1.25em' }}>{errorMessage || helperText || ' '}</FormHelperText>
+          </FormControl>
+        </Grid>
       )}
     />
   );
