@@ -24,5 +24,8 @@
   "typeToFilter": "Type to filter...",
   "listProjects": "Project Listing",
   "search": "Search",
-  "newProject": "New Project"
+  "newProject": "New Project",
+  "filter": "Filter",
+  "startDate": "Start Date",
+  "endDate": "End Date"
 }

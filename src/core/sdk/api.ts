@@ -11,8 +11,6 @@
  */
 
 export interface UserRequest {
-  /** @format int64 */
-  id?: number;
   /** @minLength 1 */
   personalNumber: string;
   /** @minLength 1 */
@@ -22,12 +20,11 @@ export interface UserRequest {
   /** @minLength 1 */
   email: string;
   phone?: string;
-  /** @minLength 1 */
-  password: string;
+  password?: string;
   /** @format date-time */
   expiration: string;
-  resetPassword: boolean;
-  active: boolean;
+  resetPassword?: boolean;
+  active?: boolean;
 }
 
 export interface UserDTO {
@@ -277,6 +274,7 @@ export interface PackageStructureRecord {
 export interface ProjectDTO {
   /** @format int64 */
   id?: number;
+  code?: string;
   name?: string;
   type?: ProjectDtoTypeEnum;
   technology?: string;
@@ -308,6 +306,56 @@ export interface TestJavaRecord {
   controller?: string[];
   util?: string[];
   config?: string[];
+}
+
+export interface SearchUserRequest {
+  personalNumber?: string;
+  name?: string;
+  email?: string;
+  /** @format date */
+  startExpiration?: string;
+  /** @format date */
+  endExpiration?: string;
+  active?: boolean;
+  orderColumn?: string;
+  orderDirection?: string;
+  /** @format int32 */
+  pageNum: number;
+  /** @format int32 */
+  pageSize: number;
+}
+
+export interface PageInfoUserDTO {
+  /** @format int64 */
+  total?: number;
+  list?: UserDTO[];
+  /** @format int32 */
+  pageNum?: number;
+  /** @format int32 */
+  pageSize?: number;
+  /** @format int32 */
+  size?: number;
+  /** @format int64 */
+  startRow?: number;
+  /** @format int64 */
+  endRow?: number;
+  /** @format int32 */
+  pages?: number;
+  /** @format int32 */
+  prePage?: number;
+  /** @format int32 */
+  nextPage?: number;
+  isFirstPage?: boolean;
+  isLastPage?: boolean;
+  hasPreviousPage?: boolean;
+  hasNextPage?: boolean;
+  /** @format int32 */
+  navigatePages?: number;
+  navigatepageNums?: number[];
+  /** @format int32 */
+  navigateFirstPage?: number;
+  /** @format int32 */
+  navigateLastPage?: number;
 }
 
 export interface ServiceOrderDTO {
@@ -344,14 +392,16 @@ export interface SearchProjectRequest {
   startDate?: string;
   /** @format date */
   endDate?: string;
+  code?: string;
   name?: string;
   projectType?: SearchProjectRequestProjectTypeEnum;
-  description?: string;
   projectStatus?: SearchProjectRequestProjectStatusEnum;
+  orderColumn?: string;
+  orderDirection?: string;
   /** @format int32 */
-  pageNum?: number;
+  pageNum: number;
   /** @format int32 */
-  pageSize?: number;
+  pageSize: number;
 }
 
 export interface PageInfoProjectDTO {
@@ -640,6 +690,9 @@ export class HttpClient<SecurityDataType = unknown> {
  * @baseUrl http://localhost:5000/geartech.back
  *
  * Documentação automática Geartech
+ *
+ * **Formato de Resposta Padrão:**
+ * Todas as respostas seguem o schema `ApiResponse<T>` com campos: `status`, `processed`, `message`, `fieldErrors`, `data`.
  */
 export class Api<
   SecurityDataType extends unknown,
@@ -652,10 +705,40 @@ export class Api<
      * @name UpdateUser
      * @request PUT:/user/update/{id}
      */
-    updateUser: (id: string, data: UserRequest, params: RequestParams = {}) =>
+    updateUser: (id: number, data: UserRequest, params: RequestParams = {}) =>
       this.request<UserDTO, any>({
         path: `/user/update/${id}`,
         method: "PUT",
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name DeactivateUser
+     * @request PUT:/user/deactivate/{id}
+     */
+    deactivateUser: (id: number, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/user/deactivate/${id}`,
+        method: "PUT",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name ListUsers
+     * @request POST:/user/list
+     */
+    listUsers: (data: SearchUserRequest, params: RequestParams = {}) =>
+      this.request<PageInfoUserDTO, any>({
+        path: `/user/list`,
+        method: "POST",
         body: data,
         type: ContentType.Json,
         ...params,
@@ -684,7 +767,7 @@ export class Api<
      * @name GetByIdUser
      * @request GET:/user/get/{id}
      */
-    getByIdUser: (id: string, params: RequestParams = {}) =>
+    getByIdUser: (id: number, params: RequestParams = {}) =>
       this.request<UserDTO, any>({
         path: `/user/get/${id}`,
         method: "GET",
@@ -698,7 +781,7 @@ export class Api<
      * @name DeleteUser
      * @request DELETE:/user/delete/{id}
      */
-    deleteUser: (id: string, params: RequestParams = {}) =>
+    deleteUser: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/user/delete/${id}`,
         method: "DELETE",
@@ -714,7 +797,7 @@ export class Api<
      * @request PUT:/project/update/{id}
      */
     updateProject: (
-      id: string,
+      id: number,
       data: ProjectRequest,
       params: RequestParams = {},
     ) =>
@@ -765,7 +848,7 @@ export class Api<
      * @name GetByIdProject
      * @request GET:/project/get/{id}
      */
-    getByIdProject: (id: string, params: RequestParams = {}) =>
+    getByIdProject: (id: number, params: RequestParams = {}) =>
       this.request<ProjectDTO, any>({
         path: `/project/get/${id}`,
         method: "GET",
@@ -779,7 +862,7 @@ export class Api<
      * @name DeleteProject
      * @request DELETE:/project/delete/{id}
      */
-    deleteProject: (id: string, params: RequestParams = {}) =>
+    deleteProject: (id: number, params: RequestParams = {}) =>
       this.request<void, any>({
         path: `/project/delete/${id}`,
         method: "DELETE",

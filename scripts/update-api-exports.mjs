@@ -53,51 +53,83 @@ function extractExportedTypes(content) {
 }
 
 function categorizeInterfaces(interfaces) {
-    return {
+    const categorized = new Set();
+
+    const categories = {
         // DTOs principais
-        main: interfaces.filter(name =>
-            name.endsWith('DTO') &&
-            !name.includes('PageInfo') &&
-            !name.includes('UserLogin')
-        ),
+        main: interfaces.filter(name => {
+            if (name.endsWith('DTO') && !name.includes('PageInfo') && !name.includes('UserLogin')) {
+                categorized.add(name);
+                return true;
+            }
+            return false;
+        }),
 
         // DTOs especiais
-        special: interfaces.filter(name =>
-            name.includes('PageInfo') ||
-            name.includes('UserLogin')
-        ),
+        special: interfaces.filter(name => {
+            if (name.includes('PageInfo') || name.includes('UserLogin')) {
+                categorized.add(name);
+                return true;
+            }
+            return false;
+        }),
 
         // Requests
-        requests: interfaces.filter(name => name.endsWith('Request')),
+        requests: interfaces.filter(name => {
+            if (name.endsWith('Request')) {
+                categorized.add(name);
+                return true;
+            }
+            return false;
+        }),
 
         // Records de AST
-        ast: interfaces.filter(name => name.startsWith('Ast') && name.endsWith('Record')),
+        ast: interfaces.filter(name => {
+            if (name.startsWith('Ast') && name.endsWith('Record')) {
+                categorized.add(name);
+                return true;
+            }
+            return false;
+        }),
+
+        // Records de estrutura (verificar ANTES de architecture para evitar duplicação)
+        structure: interfaces.filter(name => {
+            if (!categorized.has(name) &&
+                (name.includes('MainJavaRecord') ||
+                    name.includes('MainResourcesRecord') ||
+                    name.includes('TestJavaRecord') ||
+                    name.includes('BasePackageRecord'))) {
+                categorized.add(name);
+                return true;
+            }
+            return false;
+        }),
 
         // Records de arquitetura
-        architecture: interfaces.filter(name =>
-            name.endsWith('Record') &&
-            !name.startsWith('Ast') &&
-            !name.includes('Package') &&
-            !name.includes('Main') &&
-            !name.includes('Test')
-        ),
-
-        // Records de estrutura
-        structure: interfaces.filter(name =>
-            name.includes('PackageRecord') ||
-            name.includes('MainJavaRecord') ||
-            name.includes('MainResourcesRecord') ||
-            name.includes('TestJavaRecord') ||
-            name.includes('BasePackageRecord')
-        ),
+        architecture: interfaces.filter(name => {
+            if (!categorized.has(name) &&
+                name.endsWith('Record') &&
+                !name.startsWith('Ast')) {
+                categorized.add(name);
+                return true;
+            }
+            return false;
+        }),
 
         // Outros
-        other: interfaces.filter(name =>
-            !name.endsWith('DTO') &&
-            !name.endsWith('Request') &&
-            !name.endsWith('Record')
-        )
+        other: interfaces.filter(name => {
+            if (!categorized.has(name) &&
+                !name.endsWith('DTO') &&
+                !name.endsWith('Request') &&
+                !name.endsWith('Record')) {
+                categorized.add(name);
+                return true;
+            }
+            return false;
+        })
     };
+
+    return categories;
 }
 
 function categorizeEnums(enums) {
@@ -241,14 +273,10 @@ function generateExportSection(interfaces, enums, types) {
 function updateIndexFile(interfaces, enums, types) {
     let indexContent = readFileSync(INDEX_FILE, 'utf-8');
 
-    // Remove seções de exportação existentes
-    const enumSectionRegex = /\/\/ ===== Exportação dos Enums =====[\s\S]*?} from '\.\/api';\n\n?/;
-    const typeSectionRegex = /\/\/ ===== Exportação dos Types =====[\s\S]*?} from '\.\/api';\n\n?/;
-    const dtoSectionRegex = /\/\/ ===== Exportação dos DTOs =====[\s\S]*?} from '\.\/api';\n/;
+    // Remove TODAS as seções de exportação geradas (Enums, Types e DTOs) em uma única operação
+    const allExportsSectionRegex = /\/\/ ===== Exportação dos (Enums|Types|DTOs) =====[\s\S]*$/;
 
-    indexContent = indexContent.replace(enumSectionRegex, '');
-    indexContent = indexContent.replace(typeSectionRegex, '');
-    indexContent = indexContent.replace(dtoSectionRegex, '');
+    indexContent = indexContent.replace(allExportsSectionRegex, '');
 
     // Remove linhas em branco extras no final
     indexContent = indexContent.trimEnd();

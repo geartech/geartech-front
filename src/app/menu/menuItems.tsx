@@ -70,12 +70,12 @@ export const menuItems: MenuItemProps[] = [
     icon: <Settings sx={{ fontSize: 20 }} />,
     permission: ['ADM', 'SETTINGS_ACCESS'],
     children: [
-      { text: 'Regras', href: '/pages/auth/workspace/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
-      { text: 'Integrações', href: '/pages/auth/workspace/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
-      { text: 'Usuários', href: '/pages/auth/workspace/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Regras', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Integrações', href: '/pages/auth/settings/project/ProjectList', permission: ['ADM', 'PROJECT_ACCESS'] },
+      { text: 'Usuários', href: '/pages/auth/settings/users/UserList', permission: ['ADM', 'USER_ACCESS'] },
       {
         text: 'Templates / Fluxos',
-        href: '/pages/auth/workspace/project/ProjectList',
+        href: '/pages/auth/settings/project/ProjectList',
         permission: ['ADM', 'PROJECT_ACCESS'],
       },
     ],

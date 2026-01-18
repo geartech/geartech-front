@@ -1,10 +1,11 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MaterialReactTable, MRT_ColumnDef, MRT_RowData } from 'material-react-table';
+import { MaterialReactTable, MRT_ColumnDef, MRT_RowData, MRT_SortingState } from 'material-react-table';
 import localization from './localization';
 import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Tooltip } from '@mui/material';
 import { PlagiarismOutlined, DeleteForeverOutlined, ModeEditOutline } from '@mui/icons-material';
 import { Button } from '../Button';
+import type { Updater } from '@tanstack/react-table';
 
 type FooterActionsRenderer<T> =
   | JSX.Element
@@ -17,6 +18,21 @@ export type GridColumnDef<T extends MRT_RowData> = MRT_ColumnDef<T> & {
   i18nPrefix?: string;
 };
 
+type PaginationState = {
+  pageIndex: number;
+  pageSize: number;
+};
+
+type SortingState = MRT_SortingState;
+
+// Parâmetros enviados no onFetch
+export type GridFetchParams = {
+  pageNum: number;
+  pageSize: number;
+  orderColumn?: string;
+  orderDirection?: 'ASC' | 'DESC';
+};
+
 type GridProps<T extends MRT_RowData> = {
   title?: string | JSX.Element;
   columns: GridColumnDef<T>[];
@@ -26,8 +42,15 @@ type GridProps<T extends MRT_RowData> = {
   onView?: (row: T) => void;
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => Promise<void> | void;
-  footerActions?: FooterActionsRenderer<T>; // << botões no footer
-  onMultipleDelete?: (ids: (string | number)[]) => void; // << callback para exclusão múltipla
+  footerActions?: FooterActionsRenderer<T>;
+  onMultipleDelete?: (ids: (string | number)[]) => void;
+  // Paginação server-side
+  totalRows?: number;
+  initialPageSize?: number;
+  // Callback único para fetch (substitui onPaginationChange + onSortingChange)
+  onFetch?: (params: GridFetchParams) => void;
+  // Loading state
+  loading?: boolean;
 };
 
 export default function Grid<T extends MRT_RowData>({
@@ -41,23 +64,59 @@ export default function Grid<T extends MRT_RowData>({
   footerActions,
   onMultipleDelete,
   title,
+  totalRows = 0,
+  initialPageSize = 10,
+  onFetch,
+  loading = false,
 }: GridProps<T>) {
   const { t } = useTranslation();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [rowToDelete, setRowToDelete] = useState<T | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // multi-seleção
+  // Determina se é paginação/ordenação manual (server-side)
+  const isServerSide = totalRows > 0 && !!onFetch;
+
+  // Estado interno de paginação
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: initialPageSize,
+  });
+
+  // Estado interno de ordenação
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  // Flag para evitar fetch no mount
+  const isInitialMount = useRef(true);
+
+  // Multi-seleção
   const [selectMode, setSelectMode] = useState(false);
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 
-  // exclusão múltipla
+  // Exclusão múltipla
   const [confirmMultipleOpen, setConfirmMultipleOpen] = useState(false);
   const [idsToDelete, setIdsToDelete] = useState<(string | number)[]>([]);
   const [deletingMultiple, setDeletingMultiple] = useState(false);
 
-  // Auto-height: o grid ocupa 100% da altura do container (View.Body cuida do overflow)
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Dispara fetch quando paginação/sorting mudam (apenas server-side)
+  useEffect(() => {
+    if (!isServerSide) return;
+
+    // Pula o primeiro render
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    onFetch?.({
+      pageNum: pagination.pageIndex + 1,
+      pageSize: pagination.pageSize,
+      orderColumn: sorting[0]?.id,
+      orderDirection: sorting[0] ? (sorting[0].desc ? 'DESC' : 'ASC') : undefined,
+    });
+  }, [pagination, sorting, isServerSide, onFetch]);
 
   const handleConfirmDelete = async () => {
     if (!rowToDelete || !onDelete) {
@@ -88,7 +147,7 @@ export default function Grid<T extends MRT_RowData>({
       setDeletingMultiple(false);
       setConfirmMultipleOpen(false);
       setIdsToDelete([]);
-      setRowSelection({}); // limpa seleção após exclusão
+      setRowSelection({});
     }
   };
 
@@ -105,20 +164,16 @@ export default function Grid<T extends MRT_RowData>({
     return columns.map((col) => {
       let newCol = { ...col };
 
-      // Traduz header se for string (chave i18n)
       if (typeof newCol.header === 'string') {
         newCol.header = t(newCol.header);
       }
 
-      // Processa enum se aplicável
       if (col.columnType === 'enum' && col.enumType && col.i18nPrefix) {
         newCol = {
           ...newCol,
           Cell: ({ cell }) => {
             const value = cell.getValue() as string;
             if (!value) return null;
-
-            // Traduz usando i18nPrefix: enum.projectStatus.IN_PROGRESS
             const translatedValue = t(`${col.i18nPrefix}.${value}`, value);
             return <span>{translatedValue}</span>;
           },
@@ -191,6 +246,28 @@ export default function Grid<T extends MRT_RowData>({
     ];
   }, [crudRow, processedColumns, t, onView, onEdit]);
 
+  // Handler de mudança de paginação
+  const handlePaginationChange = useCallback((updater: Updater<PaginationState>) => {
+    setPagination((prev) => {
+      const next = typeof updater === 'function' ? updater(prev) : updater;
+      // Se mudou pageSize, volta para página 0
+      if (next.pageSize !== prev.pageSize) {
+        return { pageIndex: 0, pageSize: next.pageSize };
+      }
+      return next;
+    });
+  }, []);
+
+  // Handler de mudança de ordenação
+  const handleSortingChange = useCallback((updater: Updater<SortingState>) => {
+    setSorting((prev) => (typeof updater === 'function' ? updater(prev) : updater));
+    // Reset para página 1 ao mudar ordenação
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+  }, []);
+
+  // Expõe resetPagination via ref se necessário no futuro
+  // useImperativeHandle(ref, () => ({ resetPagination }));
+
   return (
     <>
       <div
@@ -209,7 +286,7 @@ export default function Grid<T extends MRT_RowData>({
           data={data}
           localization={localization}
           paginationDisplayMode="pages"
-          enableDensityToggle={false} // remove botão de alternância
+          enableDensityToggle={false}
           muiPaginationProps={{ shape: 'rounded' }}
           muiTableContainerProps={{
             sx: {
@@ -230,21 +307,33 @@ export default function Grid<T extends MRT_RowData>({
             },
           }}
           initialState={{
-            density: 'compact', // densidade fixa
+            density: 'compact',
           }}
-          // título
+          // Paginação e ordenação manual quando server-side
+          manualPagination={isServerSide}
+          manualSorting={isServerSide}
+          rowCount={isServerSide ? totalRows : undefined}
+          // Estado controlado
+          state={{
+            rowSelection,
+            pagination,
+            sorting,
+            isLoading: loading,
+          }}
+          onPaginationChange={handlePaginationChange}
+          onSortingChange={handleSortingChange}
+          // Título
           renderTopToolbarCustomActions={() =>
             title ? <span style={{ fontSize: 20, fontWeight: 600, marginLeft: 2 }}>{title}</span> : null
           }
-          // checkboxes aparecem quando ligado
+          // Checkboxes
           enableRowSelection={selectMode}
           enableMultiRowSelection
           onRowSelectionChange={setRowSelection}
-          state={{ rowSelection }}
-          // sem banner
+          // Sem banner de alerta
           renderToolbarAlertBannerContent={() => null}
           muiToolbarAlertBannerProps={{ sx: { display: 'none' } }}
-          // footer: contagem + botões do caller
+          // Footer
           renderBottomToolbarCustomActions={({ table }) => {
             const selected = table.getSelectedRowModel().flatRows.map((r) => r.original as T);
             const content =
@@ -289,22 +378,18 @@ export default function Grid<T extends MRT_RowData>({
         />
       </div>
 
-      {/* Dialogs permanecem fora da div containerRef */}
-
+      {/* Dialog de confirmação de exclusão individual */}
       <Dialog
         open={confirmOpen}
         onClose={(event, reason) => {
-          if (reason === 'backdropClick') return; // impede fechar no clique fora
+          if (reason === 'backdropClick') return;
           setConfirmOpen(false);
         }}
         slotProps={{
           paper: {
             sx: (theme) => ({
-              background:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(0, 255, 255, 0.05)' // vidro escuro
-                  : 'rgba(255, 255, 255, 1)', // vidro claro
-              backdropFilter: 'blur(5px)', // embaçado
+              background: theme.palette.mode === 'dark' ? 'rgba(0, 255, 255, 0.05)' : 'rgba(255, 255, 255, 1)',
+              backdropFilter: 'blur(5px)',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
               border: '1px solid rgba(255, 255, 255, 0.18)',
               borderRadius: 3,
@@ -316,7 +401,7 @@ export default function Grid<T extends MRT_RowData>({
         <DialogContent>{t('confirmDeleteMessage')}</DialogContent>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)} buttonType="back" disabled={deleting}>
-            Cancelar
+            {t('cancel')}
           </Button>
           <Button onClick={handleConfirmDelete} buttonType="delete" disabled={deleting}>
             {deleting ? t('deleting') : t('delete')}
@@ -324,20 +409,18 @@ export default function Grid<T extends MRT_RowData>({
         </DialogActions>
       </Dialog>
 
+      {/* Dialog de confirmação de exclusão múltipla */}
       <Dialog
         open={confirmMultipleOpen}
         onClose={(event, reason) => {
-          if (reason === 'backdropClick') return; // impede fechar no clique fora
+          if (reason === 'backdropClick') return;
           setConfirmMultipleOpen(false);
         }}
         slotProps={{
           paper: {
             sx: (theme) => ({
-              background:
-                theme.palette.mode === 'dark'
-                  ? 'rgba(0, 255, 255, 0.05)' // vidro escuro
-                  : 'rgba(255, 255, 255, 1)', // vidro claro
-              backdropFilter: 'blur(5px)', // embaçado
+              background: theme.palette.mode === 'dark' ? 'rgba(0, 255, 255, 0.05)' : 'rgba(255, 255, 255, 1)',
+              backdropFilter: 'blur(5px)',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.25)',
               border: '1px solid rgba(255, 255, 255, 0.18)',
               borderRadius: 3,

@@ -8,9 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "clean": "rimraf .next node_modules package-lock.json",
-    "generate:api": "npx swagger-typescript-api generate -p http://localhost:5000/geartech.back/v3/api-docs -o ./src/core/sdk -n api.ts --http-client axios --extract-enums",
-    "update:api-exports": "node scripts/update-api-exports.mjs",
-    "regenerate:api": "npm run generate:api && npm run update:api-exports"
+    "generate:api": "npx swagger-typescript-api generate -p http://localhost:5000/geartech.back/v3/api-docs -o ./src/core/sdk -n api.ts --http-client axios --extract-enums"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

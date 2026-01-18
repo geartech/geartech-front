@@ -26,5 +26,7 @@
   "search": "Pesquisar",
   "startDate": "Data de Início",
   "endDate": "Data Fim",
-  "newProject": "Novo Projeto"
+  "newProject": "Novo Projeto",
+  "filter": "Filtrar"
+
 }

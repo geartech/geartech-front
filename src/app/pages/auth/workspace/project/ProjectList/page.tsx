@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { Form } from '@/components/digital/Form';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/digital/Button';
-import { useFormRef } from '@/app/utils/useFormRef';
+import { useFormRef } from '@/app/utils/hooks/useFormRef';
 
 const { Header, Body } = View;
 
@@ -92,23 +92,14 @@ export default function ProjectList() {
       />
 
       <Body>
-        {/* Form tipado com genéricos inline */}
-
         <Form<SearchProjectRequest> ref={formRef}>
-          <Form.DatePicker name="startDate" label="startDate" required />
-          <Form.DatePicker name="endDate" label="endDate" />
-
-          <Form.Input
-            name="name"
-            label="projectName"
-            placeholder="typeToFilter"
-            maxLength={150}
-            loading={false}
-            required
-          />
+          <Form.Section title="filter" layout="inline">
+            <Form.DatePicker name="startDate" label="startDate" compact />
+            <Form.DatePicker name="endDate" label="endDate" compact />
+            <Form.Input name="name" label="projectName" placeholder="typeToFilter" maxLength={150} loading={false} />
+          </Form.Section>
         </Form>
 
-        {/* Grid com dados da busca */}
         <Grid
           title={t('listProjects')}
           columns={getColumns()}

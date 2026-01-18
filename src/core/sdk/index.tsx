@@ -1,86 +1,15 @@
-import { Api } from './api'; // SDK gerado pelo swagger-typescript-api
-import axios from 'axios';
+// ===== Cliente configurado =====
+export { api, geartechApi } from './client';
 
-// ===== Instâncias Axios =====
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/',
-  withCredentials: true,
-  timeout: 30000,
-});
+// ===== Tipos customizados =====
+export { isApiError, hasFieldErrors } from './types';
+export type { ApiResponse, ApiError, FieldError, ProcessStatus } from './types';
 
-const refreshApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/',
-  withCredentials: true,
-});
-
-// ===== Interceptors customizados =====
-
-const logout = async () => {
-  try {
-    await geartechApi.auth.logout(); // chama o endpoint que limpa os cookies
-  } catch {}
-  window.location.href = '/pages/public/login';
-};
-
-function applyCustomInterceptors(instance: typeof api) {
-  instance.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const originalRequest = error.config;
-
-      const isAuthEndpoint =
-        originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/refresh');
-
-      if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
-        originalRequest._retry = true;
-
-        try {
-          await refreshApi.post('/auth/refresh');
-          return api(originalRequest);
-        } catch (err) {
-          logout();
-          return Promise.reject(err);
-        }
-      }
-
-      if (error.response?.status === 401 && isAuthEndpoint) {
-        logout();
-      }
-
-      return Promise.reject(error);
-    }
-  );
-}
-
-// Aplique nos dois
-applyCustomInterceptors(api);
-
-// ===== SDK Geartech =====
-
-export const geartechApi = new Api({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/',
-  withCredentials: true,
-});
-
-// usa credenciais
-geartechApi.instance.defaults.withCredentials = true;
-
-// SDK usa internamente o Axios próprio, mas agora com os mesmos interceptors!
-applyCustomInterceptors(geartechApi.instance);
-
-// ===== Como usar =====
-
-// Apenas use geartechApi no app inteiro:
-// await geartechApi.auth.login({ username: '...', password: '...' });
-
-// ===== Exportação dos Enums =====
-// Re-exporte os enums gerados pelo swagger-typescript-api
+// ===== Enums (gerados) =====
 export {
-  // Enums de status
   ProjectDtoStatusEnum,
   SearchProjectRequestProjectStatusEnum,
   ServiceOrderDtoStatusEnum,
-  // Enums de tipo
   ContentType,
   CreateServiceOrderParamsServiceTypeEnum,
   ProjectDtoTypeEnum,
@@ -89,26 +18,27 @@ export {
   ServiceOrderDtoServiceTypeEnum,
 } from './api';
 
-// ===== Exportação dos Types =====
-// Re-exporte os type aliases gerados pelo swagger-typescript-api
+// ===== Types utilitários (gerados) =====
 export type { QueryParamsType, RequestParams } from './api';
 
-// ===== Exportação dos DTOs =====
-// Re-exporte os tipos DTO gerados pelo swagger-typescript-api
+// ===== DTOs (gerados) =====
 export type {
-  // DTOs principais
+  // Principais
   ProjectDTO,
   ServiceOrderDTO,
   UserDTO,
-  // DTOs especiais
+  // Paginação
   PageInfoProjectDTO,
+  PageInfoUserDTO,
+  // Auth
   UserLoginDTO,
-  // Requests
   AuthRequest,
+  // Requests
   ProjectRequest,
   SearchProjectRequest,
+  SearchUserRequest,
   UserRequest,
-  // Records de AST
+  // AST Records
   AstAnnotationRecord,
   AstConfigurationRecord,
   AstControllerRecord,
@@ -129,17 +59,18 @@ export type {
   AstServiceRecord,
   AstSqlStatementRecord,
   AstTestRecord,
-  // Records de arquitetura
+  // Arquitetura
   ArchitectureInfoRecord,
   BuildInfoRecord,
   DatabaseInfoRecord,
+  PackageStructureRecord,
   ProjectInfoRecord,
-  // Records de estrutura
+  // Estrutura
   BasePackageRecord,
   MainJavaRecord,
   MainResourcesRecord,
   TestJavaRecord,
-  // Outros tipos
+  // Outros
   ApiConfig,
   FullRequestParams,
   ProjectInfoResponse,
