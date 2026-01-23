@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 import { DesktopDatePicker, DesktopDatePickerProps } from '@mui/x-date-pickers';
 import { Grid } from '@mui/material';
+import { useFormDisabled } from './FormDisabledContext';
+import dayjs, { Dayjs } from 'dayjs';
 
 export type FormDatePickerProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
   Omit<DesktopDatePickerProps, 'value' | 'onChange'> & {
@@ -25,6 +27,7 @@ export function FormDatePicker<TFormValues extends FieldValues>({
   ...datePickerProps
 }: FormDatePickerProps<TFormValues>) {
   const { t } = useTranslation();
+  const formDisabled = useFormDisabled();
   const {
     control,
     formState: { errors },
@@ -52,7 +55,16 @@ export function FormDatePicker<TFormValues extends FieldValues>({
         ...rules,
       }}
       render={({ field }) => {
-        const safeValue = field.value && typeof field.value === 'object' ? field.value : field.value ?? null;
+        // Converte string para dayjs se necessário
+        let safeValue: Dayjs | null = null;
+        if (field.value) {
+          if (typeof field.value === 'string') {
+            const parsed = dayjs(field.value);
+            safeValue = parsed.isValid() ? parsed : null;
+          } else if (dayjs.isDayjs(field.value)) {
+            safeValue = field.value;
+          }
+        }
 
         return (
           <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
@@ -63,7 +75,7 @@ export function FormDatePicker<TFormValues extends FieldValues>({
               closeOnSelect
               onChange={(date) => field.onChange(date)}
               onAccept={(date) => field.onChange(date)}
-              disabled={disabled}
+              disabled={disabled || formDisabled}
               inputRef={field.ref}
               slotProps={{
                 toolbar: { hidden: true },

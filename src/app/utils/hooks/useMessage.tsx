@@ -185,10 +185,10 @@ export function SnackbarProvider({
 
 // ===== Hook =====
 
-export function useSnackbar(): SnackbarContextValue {
+export function useMessage(): SnackbarContextValue {
   const context = useContext(SnackbarContext);
   if (!context) {
-    throw new Error('useSnackbar must be used within SnackbarProvider');
+    throw new Error('useMessage must be used within SnackbarProvider');
   }
   return context;
 }

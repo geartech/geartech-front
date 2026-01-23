@@ -5,6 +5,7 @@ import TextField, { TextFieldProps } from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 import { Grid, Skeleton } from '@mui/material';
+import { useFormDisabled } from './FormDisabledContext';
 
 export type FormInputProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
   Omit<TextFieldProps, 'name' | 'error' | 'helperText' | 'value' | 'onChange' | 'onBlur'> & {
@@ -29,6 +30,7 @@ export function FormInput<TFormValues extends FieldValues>({
   ...textFieldProps
 }: FormInputProps<TFormValues>) {
   const { t } = useTranslation();
+  const formDisabled = useFormDisabled();
   const {
     control,
     formState: { errors },
@@ -81,7 +83,7 @@ export function FormInput<TFormValues extends FieldValues>({
             label={translatedLabel}
             placeholder={translatedPlaceholder}
             required={required}
-            disabled={disabled}
+            disabled={disabled || formDisabled}
             error={!!fieldError}
             helperText={errorMessage || helperText || ' '}
             FormHelperTextProps={{

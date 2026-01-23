@@ -17,20 +17,22 @@ import { FormTimePicker } from './FormTimePicker';
 import { FormButton } from './FormButton';
 import { FormActions } from './FormActions';
 import { FormSection } from './FormSection';
+import { FormDisabledProvider } from './FormDisabledContext';
 
 export interface FormHandle<TFormValues extends FieldValues> {
   getValues: UseFormReturn<TFormValues>['getValues'];
   handleSubmit: UseFormReturn<TFormValues>['handleSubmit'];
   reset: UseFormReturn<TFormValues>['reset'];
+  setValue: UseFormReturn<TFormValues>['setValue'];
   formState: UseFormReturn<TFormValues>['formState'];
   watch: UseFormReturn<TFormValues>['watch'];
 }
 
 interface FormContainerProps<TFormValues extends FieldValues>
-  extends FormProps<TFormValues>,
-    Omit<BoxProps, 'onSubmit' | 'children'> {
+  extends FormProps<TFormValues>, Omit<BoxProps, 'onSubmit' | 'children'> {
   form?: React.RefObject<FormHandle<TFormValues>>;
   alignItems?: 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline';
+  disabled?: boolean;
 }
 
 function FormContainerComponent<TFormValues extends FieldValues>(
@@ -44,6 +46,7 @@ function FormContainerComponent<TFormValues extends FieldValues>(
     className,
     form,
     alignItems = 'stretch',
+    disabled = false,
     ...boxProps
   }: FormContainerProps<TFormValues>,
   ref: React.Ref<FormHandle<TFormValues>>
@@ -58,6 +61,7 @@ function FormContainerComponent<TFormValues extends FieldValues>(
     getValues: methods.getValues,
     handleSubmit: methods.handleSubmit,
     reset: methods.reset,
+    setValue: methods.setValue,
     formState: methods.formState,
     watch: methods.watch,
   }));
@@ -68,6 +72,7 @@ function FormContainerComponent<TFormValues extends FieldValues>(
         getValues: methods.getValues,
         handleSubmit: methods.handleSubmit,
         reset: methods.reset,
+        setValue: methods.setValue,
         formState: methods.formState,
         watch: methods.watch,
       });
@@ -77,15 +82,17 @@ function FormContainerComponent<TFormValues extends FieldValues>(
   const handleFormSubmit = onSubmit ? methods.handleSubmit(onSubmit) : (e: React.FormEvent) => e.preventDefault();
 
   return (
-    <FormProvider {...methods}>
-      <Paper variant="outlined" elevation={1} sx={{ p: 1, pt: 1.5, mb: 1, borderRadius: 2 }}>
-        <Box component="form" id={id} className={className} onSubmit={handleFormSubmit} noValidate {...boxProps}>
-          <Grid container rowSpacing={3} columnSpacing={2} alignItems={alignItems} wrap="wrap">
-            {children}
-          </Grid>
-        </Box>
-      </Paper>
-    </FormProvider>
+    <FormDisabledProvider disabled={disabled}>
+      <FormProvider {...methods}>
+        <Paper variant="outlined" elevation={1} sx={{ p: 1, pt: 1.5, mb: 1, borderRadius: 2 }}>
+          <Box component="form" id={id} className={className} onSubmit={handleFormSubmit} noValidate {...boxProps}>
+            <Grid container rowSpacing={3} columnSpacing={2} alignItems={alignItems} wrap="wrap">
+              {children}
+            </Grid>
+          </Box>
+        </Paper>
+      </FormProvider>
+    </FormDisabledProvider>
   );
 }
 

@@ -8,6 +8,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { useTranslation } from 'react-i18next';
 import { FormFieldBaseProps, getErrorMessage } from './types';
 import { Box, Grid } from '@mui/material';
+import { useFormDisabled } from './FormDisabledContext';
 
 export type FormSwitchProps<TFormValues extends FieldValues> = FormFieldBaseProps<TFormValues> &
   Omit<SwitchProps, 'name' | 'checked' | 'onChange' | 'onBlur'> & {
@@ -29,6 +30,7 @@ export function FormSwitch<TFormValues extends FieldValues>({
   ...switchProps
 }: FormSwitchProps<TFormValues>) {
   const { t } = useTranslation();
+  const formDisabled = useFormDisabled();
   const {
     control,
     formState: { errors },
@@ -59,7 +61,7 @@ export function FormSwitch<TFormValues extends FieldValues>({
         <Grid size={compact ? 'auto' : toResponsiveSize(baseSize)}>
           <FormControl
             error={!!fieldError}
-            disabled={disabled}
+            disabled={disabled || formDisabled}
             sx={{
               minWidth: compact ? '180px' : 'auto',
               width: compact ? '180px' : '100%',

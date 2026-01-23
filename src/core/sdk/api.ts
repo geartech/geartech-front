@@ -787,6 +787,20 @@ export class Api<
         method: "DELETE",
         ...params,
       }),
+
+    /**
+     * No description
+     *
+     * @tags user-controller
+     * @name DeleteMultipleUsers
+     * @request DELETE:/user/delete-multiple/{ids}
+     */
+    deleteMultipleUsers: (ids: number[], params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/user/delete-multiple/${ids}`,
+        method: "DELETE",
+        ...params,
+      }),
   };
   project = {
     /**

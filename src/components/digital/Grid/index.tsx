@@ -43,7 +43,7 @@ type GridProps<T extends MRT_RowData> = {
   onEdit?: (row: T) => void;
   onDelete?: (row: T) => Promise<void> | void;
   footerActions?: FooterActionsRenderer<T>;
-  onMultipleDelete?: (ids: (string | number)[]) => void;
+  onMultipleDelete?: (ids: number[]) => void;
   // Paginação server-side
   totalRows?: number;
   initialPageSize?: number;
@@ -95,7 +95,7 @@ export default function Grid<T extends MRT_RowData>({
 
   // Exclusão múltipla
   const [confirmMultipleOpen, setConfirmMultipleOpen] = useState(false);
-  const [idsToDelete, setIdsToDelete] = useState<(string | number)[]>([]);
+  const [idsToDelete, setIdsToDelete] = useState<number[]>([]);
   const [deletingMultiple, setDeletingMultiple] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
